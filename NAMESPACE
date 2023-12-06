@@ -3,4 +3,5 @@
 export(SOP_from_matrix_list)
 export(compute_sop)
 export(compute_transition_probabilities)
+export(create_survival)
 export(generate_dataset)
