@@ -1,0 +1,109 @@
+---
+title: "Overview"
+author: "Max Rohde"
+date: today
+toc: true
+toc-depth: 4
+toc-location: left
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+format:
+  html:
+    code-tools: true
+    code-fold: false
+    code-link: true
+    standalone: true
+    embed-resources: true
+    code-block-bg: "#f1f3f5"
+    code-block-border-left: "#31BAE9"
+    mainfont: Source Sans Pro
+    theme: cosmo
+    fontsize: 16px
+    fig-format: retina
+    fig-cap-location: margin
+    tbl-cap-location: top
+    reference-location: margin
+    citation-location: margin
+    fig-width: 8
+    fig-height: 6
+  
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(otm)
+library(tidyverse)
+
+# Set global ggplot theme
+theme_set(cowplot::theme_cowplot(font_size=12,
+                                 font_family = "Source Sans Pro"))
+```
+
+```{r}
+params <-
+  list(
+    cutpoints = c(
+      2.704779695,
+      3.283274970,
+      3.759044255,
+      6.152768017,
+      9.928567811,
+      12.594702347,
+      19.080282386
+    ),
+    beta_yprev = c(
+      0.006164718,
+      3.668244235,
+      4.756980385,
+      7.696745715,
+      11.098149358,
+      15.471452261
+    ),
+    beta_time = -0.013360423,
+    beta_regression = -0.094833284
+  )
+```
+
+Compute the SOPs by simulation.
+
+```{r}
+df <- generate_dataset(params,
+                       covariates = 1,
+                       baseline_y = 4,
+                       absorb = 8,
+                       times = 1:28,
+                       n_subjects = 1e4)
+```
+
+```{r}
+sim_sop <-
+  df |>
+    summarize(n = n(), .by = c("day", "y")) |>
+    mutate(sop = n / sum(n), .by = c("day")) |>
+    complete(day, y, fill = list(sop = 0)) |>
+    arrange(day, y) |>
+    pull(sop)
+```
+
+Compute the theoretical SOPs analytically (recursive matrix multiplication).
+
+```{r}
+theoretical_sop <-
+compute_sop(params = params,
+            covariates = 1,
+            baseline_y = 4,
+            absorb = 8,
+            times = 1:28,
+            output_type = "df") |>
+  arrange(day, y) |>
+  pull(sop)
+```
+
+```{r}
+(sim_sop - theoretical_sop) |> round(3)
+```
+
+
