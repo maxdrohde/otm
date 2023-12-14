@@ -7,13 +7,15 @@
 compute_sop(params, covariates, baseline_y, times, absorb, output_type = "df")
 }
 \arguments{
-\item{params}{A named list containing the parameters of the OTM. Must include "beta_yprev": k-1 parameters for the k previous states,
-"beta_regression": parameters for each covariates, "beta_time": a single slope for the time parameter, and
+\item{params}{A named list containing the parameters of the OTM.
+Must include "beta_yprev": k-1 parameters for the k previous states,
+"beta_regression": parameters for each covariates,
+"beta_time": a single slope for the time parameter, and
 "cutpoints": the cutpoint parameters.}
 
 \item{covariates}{A vector of covariates}
 
-\item{baseline_y}{The baseline state of the subjects used when generating the data}
+\item{baseline_y}{The baseline state of the subject}
 
 \item{times}{A vector of times to generate data for}
 

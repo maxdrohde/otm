@@ -7,8 +7,10 @@
 compute_transition_probabilities(params, yprev, day, covariates)
 }
 \arguments{
-\item{params}{A named list containing the parameters of the OTM. Must include "beta_yprev": k-1 parameters for the k previous states,
-"beta_regression": parameters for each covariates, "beta_time": a single slope for the time parameter, and
+\item{params}{A named list containing the parameters of the OTM.
+Must include "beta_yprev": k-1 parameters for the k previous states,
+"beta_regression": parameters for each covariates,
+"beta_time": a single slope for the time parameter, and
 "cutpoints": the cutpoint parameters.}
 
 \item{yprev}{The previous state to be conditioned on.}
@@ -18,8 +20,9 @@ compute_transition_probabilities(params, yprev, day, covariates)
 \item{covariates}{A vector of covariates}
 }
 \value{
-A vector of transition probabilities. The length is equal to the number of states.
+A vector of transition probabilities.
 }
 \description{
-Given the parameters from an ordinal transition model (OTM), calculate the transition probabilities for a given time and previous state.
+Given the parameters from an ordinal transition model (OTM),
+calculate the transition probabilities for a given time and previous state.
 }

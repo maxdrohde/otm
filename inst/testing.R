@@ -10,7 +10,7 @@ compute_transition_probabilities(params = params,
                                  covariates = 1) |> round(3)
 
 
-generate_record(params, 1, 4, 1:28, 8)
+generate_dataset(params, 1, 4, 1:28, 8, n_subjects=1)
 
 
 # Verify that simulating data gives same results as theoretical SOP calculation

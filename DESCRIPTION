@@ -15,4 +15,7 @@ Config/testthat/edition: 3
 Imports: 
     data.table,
     purrr,
+    Rcpp,
     reshape2
+LinkingTo: 
+    Rcpp
