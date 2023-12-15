@@ -4,10 +4,12 @@
 \alias{create_survival}
 \title{Generate the survival dataset from an OTM dataset}
 \usage{
-create_survival(df)
+create_survival(df, tmax)
 }
 \arguments{
 \item{df}{An OTM dataset generated with otm::generate_dataset}
+
+\item{tmax}{The final day of the trial (used for censoring at death)}
 }
 \value{
 A survival dataset

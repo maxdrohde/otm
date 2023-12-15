@@ -1,44 +1,57 @@
-get_surv_data_by_subj <- function(i, df) {
+death_index <- function(y){
+  index <- which(y == 8L)
+  if (length(index) == 0L) return(NA_integer_)
+  return(index)
+}
 
-  # Filter to current subject
-  id_df <- df[df$id == i, ]
+recovery_index <- function(y){
+  index <- which(y %in% c(1L,2L,3L))
+  if (length(index) == 0L) return(NA_integer_)
+  return(min(index))
+}
 
-  # Identify patient status
-  recovered <- (1 %in% id_df$y) || (2 %in% id_df$y) || (3 %in% id_df$y)
-  deceased <- (8 %in% id_df$y) && (!recovered)
-  censored <- !(recovered | deceased)
+assign_status <- function(id, death_day, last_day, recovery_day, tmax){
 
-  if (recovered) {
-    # Recovery day is the first day at state 1,2, or 3
-    # status = 1 is recovered / status = 0 is not recovered
-    recovery_day <- id_df[id_df$y %in% 1:3, ]
-    recovery_day <- min(recovery_day$day)
-    return(list(id = i, time = recovery_day, status = 1))
+  stopifnot(is.integer(tmax))
+
+  if (!is.na(recovery_day)) {
+    status <- 1L
+    time <- recovery_day
+  } else if(!is.na(death_day)){
+    status <- 0L
+    time <- tmax
+  } else{
+    status <- 0L
+    time <- last_day
   }
-
-  if (deceased) {
-    # Censor patients who died before recovery at day 29
-    return(list(id = i, time = 29, status = 0))
-  }
-
-  if (censored) {
-    # censor_day is the last recorded day
-    censor_day <- max(id_df$day)
-    return(list(id = i, time = censor_day, status = 0))
-  }
+  return(c(id = id, time = time, status = status))
 }
 
 #' Generate the survival dataset from an OTM dataset
 #'
 #' @param df An OTM dataset generated with otm::generate_dataset
+#' @param tmax The final day of the trial (used for censoring at death)
 #' @return A survival dataset
 #' @export
-create_survival <- function(df){
+create_survival <- function(df, tmax){
+
+  # Create a dataset that identifies for each subject
+  # death day, last day, and recovery day
   surv_df <-
-    purrr::map(unique(df$id),
-               ~get_surv_data_by_subj(i = .x,
-                                      df = df)) |>
-    data.table::rbindlist()
+    df |>
+    dplyr::summarise(death_day = day[death_index(y)],
+                     last_day = max(day),
+                     recovery_day = day[recovery_index(y)],
+                     .by="id")
+  surv_df <-
+  surv_df |>
+    purrr::transpose() |>
+    map_dfr(~assign_status(
+                       id = .x$id,
+                       death_day = .x$death_day,
+                       last_day = .x$last_day,
+                       recovery_day = .x$recovery_day,
+                       tmax = tmax))
 
   return(surv_df)
 }

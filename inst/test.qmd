@@ -1,0 +1,71 @@
+---
+title: "Rcpp"
+author: "Max Rohde"
+date: today
+toc: true
+toc-depth: 4
+toc-location: left
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+format:
+  html:
+    code-tools: true
+    code-fold: false
+    code-link: true
+    standalone: true
+    embed-resources: true
+    code-block-bg: "#f1f3f5"
+    code-block-border-left: "#31BAE9"
+    mainfont: Source Sans Pro
+    theme: cosmo
+    fontsize: 16px
+    fig-format: retina
+    fig-cap-location: margin
+    tbl-cap-location: top
+    reference-location: margin
+    citation-location: margin
+    fig-width: 8
+    fig-height: 6
+  
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(tidyverse)
+library(otm)
+```
+
+```{r}
+params <-
+  list(cutpoints = c(2.704779695, 3.283274970, 3.759044255, 6.152768017, 9.928567811, 12.594702347, 19.080282386),
+       beta_yprev = -c(-0.006164718,  -3.668244235, -4.756980385, -7.696745715, -11.098149358, -15.471452261),
+       beta_time = -0.013360423,
+       beta_regression = -0.094833284)
+```
+
+```{r}
+compute_transition_probabilities(params, 3, 1, 1) |> round(8)
+compute_transition_probabilitiesC(params, 3, 1, 1) |> round(8)
+```
+
+```{r}
+m <- bench::mark(
+               r = generate_dataset(params, covariates = 1, baseline_y = 4, times = 1:28, absorb = 8, n_subjects = 2000),
+               cpp = generate_datasetC(params, covariates = 1, baseline_y = 4, times = 1:28, absorb = 8, n_subjects = 2000),
+               check = FALSE,
+               min_time = 60,
+               memory = TRUE)
+
+print(m)
+
+autoplot(m)
+```
+
+```{r}
+df <- otm::generate_datasetC(params, covariates = 1, baseline_y = 6, times = 1:28, absorb = 8, n_subjects = 2000)
+```
+
+
