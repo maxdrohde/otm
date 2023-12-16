@@ -73,17 +73,21 @@ Compute the SOPs by simulation.
 df <- generate_dataset(params,
                        covariates = 1,
                        baseline_y = 4,
-                       absorb = 8,
+                       absorb = TRUE,
                        times = 1:28,
-                       n_subjects = 1e4)
+                       n_subjects = 1e5)
 ```
 
 ```{r}
 sim_sop <-
   df |>
-    summarize(n = n(), .by = c("day", "y")) |>
-    mutate(sop = n / sum(n), .by = c("day")) |>
-    complete(day, y, fill = list(sop = 0)) |>
+    summarize(n = n(),
+              .by = c("day", "y")) |>
+    mutate(sop = n / sum(n),
+           .by = c("day")) |>
+    complete(day,
+             y,
+             fill = list(sop = 0)) |>
     arrange(day, y) |>
     pull(sop)
 ```
@@ -95,15 +99,28 @@ theoretical_sop <-
 compute_sop(params = params,
             covariates = 1,
             baseline_y = 4,
-            absorb = 8,
+            absorb = TRUE,
             times = 1:28,
             output_type = "df") |>
   arrange(day, y) |>
   pull(sop)
 ```
 
+Compare them -- should be all close to zero.
+
 ```{r}
 (sim_sop - theoretical_sop) |> round(3)
 ```
 
+Demonstrate SOP plotting function:
+
+```{r}
+compute_sop(params = params,
+            covariates = 1,
+            baseline_y = 4,
+            absorb = TRUE,
+            times = 1:28,
+            output_type = "df") |>
+generate_sop_plot()
+```
 

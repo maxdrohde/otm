@@ -4,10 +4,14 @@
 \alias{create_survival}
 \title{Generate the survival dataset from an OTM dataset}
 \usage{
-create_survival(df, tmax)
+create_survival(df, death_state, recovery_states, tmax)
 }
 \arguments{
 \item{df}{An OTM dataset generated with otm::generate_dataset}
+
+\item{death_state}{Which state corresponds to death? Must be integer.}
+
+\item{recovery_states}{Which state(s) correspond to recovery? Must be integer.}
 
 \item{tmax}{The final day of the trial (used for censoring at death)}
 }

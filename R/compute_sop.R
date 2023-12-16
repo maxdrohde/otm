@@ -8,7 +8,7 @@
 #' @param covariates A vector of covariates
 #' @param baseline_y The baseline state of the subject
 #' @param times A vector of times to generate data for
-#' @param absorb Which state is absorbing?
+#' @param absorb Is the last y state an absorbing state?
 #' @param output_type Either "df" or "matrix"
 #' @return SOPs as a data frame or matrix.
 #' @export

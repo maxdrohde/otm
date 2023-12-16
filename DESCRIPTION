@@ -13,7 +13,10 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
-    data.table,
+    cowplot,
+    dplyr,
+    ggplot2,
+    patchwork,
     purrr,
     Rcpp,
     reshape2

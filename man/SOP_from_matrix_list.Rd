@@ -19,9 +19,9 @@ Either a matrix or data.frame containing the SOPs
 \description{
 Let the transition matrices be denoted P1, P2, ... Pn for times 1 to n.
 
-The SOP at time j, starting from a baseline state of k, is P_t * P_(t-1) * ... * P_2 * SOP_(t = 1).
-
-SOP_(t = 1) is the kth column of P_1.
+The SOP at time j, starting from a baseline state of k
+is P_t * P_(t-1) * ... * P_2 * SOP_(t = 1).
+where SOP_(t = 1) is the kth column of P_1.
 }
 \examples{
 \dontrun{

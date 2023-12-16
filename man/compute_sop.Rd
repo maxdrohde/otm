@@ -19,7 +19,7 @@ Must include "beta_yprev": k-1 parameters for the k previous states,
 
 \item{times}{A vector of times to generate data for}
 
-\item{absorb}{Which state is absorbing?}
+\item{absorb}{Is the last y state an absorbing state?}
 
 \item{output_type}{Either "df" or "matrix"}
 }
