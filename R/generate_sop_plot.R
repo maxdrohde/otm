@@ -12,7 +12,7 @@ generate_barplot <- function(sop_dataframe){
     ggplot2::labs(x = "Study Day",
          y = "SOP",
          fill = "State") +
-    cowplot::theme_cowplot()
+    cowplot::theme_cowplot(font_size = 11)
 }
 
 generate_lineplot <- function(sop_dataframe){
@@ -28,7 +28,7 @@ generate_lineplot <- function(sop_dataframe){
     ggplot2::labs(x = "Study Day",
          y = "SOP",
          color = "State") +
-    cowplot::theme_minimal_hgrid()
+    cowplot::theme_minimal_hgrid(font_size = 11)
 }
 
 #' Plot the SOPs implied by the OTM parameters

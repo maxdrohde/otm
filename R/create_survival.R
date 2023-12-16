@@ -60,9 +60,11 @@ create_survival <- function(df,
   # death day, last day, and recovery day
   surv_df <-
     df |>
-    dplyr::summarise(death_day = day[death_index(y)],
+    dplyr::summarise(death_day = day[death_index(y,
+                                                 death_state = death_state)],
                      last_day = max(day),
-                     recovery_day = day[recovery_index(y)],
+                     recovery_day = day[recovery_index(y,
+                                                       recovery_states = recovery_states)],
                      .by="id")
 
   # For each subject, assign time and status based on
