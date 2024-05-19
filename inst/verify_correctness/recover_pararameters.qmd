@@ -1,0 +1,102 @@
+---
+title: "Overview"
+author: "Max Rohde"
+date: today
+toc: true
+toc-depth: 4
+toc-location: left
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+format:
+  html:
+    code-tools: true
+    code-fold: false
+    code-link: true
+    standalone: true
+    embed-resources: true
+    code-block-bg: "#f1f3f5"
+    code-block-border-left: "#31BAE9"
+    mainfont: Source Sans Pro
+    theme: cosmo
+    fontsize: 16px
+    fig-format: retina
+    fig-cap-location: margin
+    tbl-cap-location: top
+    reference-location: margin
+    citation-location: margin
+    fig-width: 8
+    fig-height: 6
+  
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(otm)
+library(tidyverse)
+library(VGAM)
+
+# Set global ggplot theme
+theme_set(cowplot::theme_cowplot(font_size=12,
+                                 font_family = "Source Sans Pro"))
+```
+
+```{r}
+params <-
+  list(
+    cutpoints = c(
+      2.704779695,
+      3.283274970,
+      3.759044255,
+      6.152768017,
+      9.928567811,
+      12.594702347,
+      19.080282386
+    ),
+    beta_yprev = c(
+      0.006164718,
+      3.668244235,
+      4.756980385,
+      7.696745715,
+      11.098149358,
+      15.471452261
+    ),
+    beta_time = -0.013360423,
+    beta_treatment = -0.094833284
+  )
+```
+
+```{r}
+df <- generate_dataset(params,
+                       treatment = 0,
+                       baseline_y = 4,
+                       absorb = TRUE,
+                       times = 1:28,
+                       n_subjects = 10000)
+```
+
+```{r}
+mod <- vglm(ordered(y) ~ day + as.factor(yprev),
+     family=cumulative(parallel = TRUE, reverse=FALSE),
+     data=df)
+```
+
+```{r}
+as.numeric(coef(mod)[1:7])
+
+params$cutpoints
+```
+
+```{r}
+as.numeric(coef(mod)[8])
+params$beta_time * -1
+```
+
+```{r}
+as.numeric(coef(mod)[9:14])
+
+(params$beta_yprev * -1)
+```
+

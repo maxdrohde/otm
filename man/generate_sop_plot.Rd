@@ -12,7 +12,7 @@ generate_sop_plot(sop_dataframe, type = "both")
 \item{type}{Use "bar", "line", or "both" for the plot}
 }
 \value{
-Matrix of transition probabilities
+SOP plot using ggplot2
 }
 \description{
 Plot the SOPs implied by the OTM parameters

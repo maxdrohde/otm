@@ -9,33 +9,33 @@
 #'
 #' @param params A named list containing the parameters of the OTM.
 #' Must include "beta_yprev": k-1 parameters for the k previous states,
-#' "beta_regression": parameters for each covariates,
+#' "beta_treatment": parameter for the treatment effect,
 #' "beta_time": a single slope for the time parameter, and
 #' "cutpoints": the cutpoint parameters.
 #' @param yprev The previous state to be conditioned on.
 #' @param day The day to compute the transition probabilities for.
-#' @param covariates A vector of covariates
+#' @param treatment Treatment group? 0 or 1.
 #' @return A vector of transition probabilities.
 #' @export
-compute_transition_probabilities <- function(params, yprev, day, covariates) {
-    .Call(`_otm_compute_transition_probabilities`, params, yprev, day, covariates)
+compute_transition_probabilities <- function(params, yprev, day, treatment) {
+    .Call(`_otm_compute_transition_probabilities`, params, yprev, day, treatment)
 }
 
 #' Generate a dataset of OTM data (with C++)
 #'
 #' @param params A named list containing the parameters of the OTM.
 #' Must include "beta_yprev": k-1 parameters for the k previous states,
-#' "beta_regression": parameters for each covariates,
+#' "beta_treatment": parameter for the treatment effect,
 #' "beta_time": a single slope for the time parameter, and
 #' "cutpoints": the cutpoint parameters.
-#' @param covariates A vector of covariates
+#' @param treatment Treatment group? 0 or 1.
 #' @param baseline_y The baseline state of the subjects used when generating the data
 #' @param times A vector of times to generate data for
 #' @param absorb Is the last state absorbing?
 #' @param n_subjects How many subject records should be generated?
 #' @return A data frame of data generated under the first order OTM model.
 #' @export
-generate_dataset <- function(params, covariates, baseline_y, times, absorb, n_subjects) {
-    .Call(`_otm_generate_dataset`, params, covariates, baseline_y, times, absorb, n_subjects)
+generate_dataset <- function(params, treatment, baseline_y, times, absorb, n_subjects) {
+    .Call(`_otm_generate_dataset`, params, treatment, baseline_y, times, absorb, n_subjects)
 }
 

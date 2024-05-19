@@ -11,32 +11,32 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // compute_transition_probabilities
-NumericVector compute_transition_probabilities(List params, int yprev, int day, NumericVector covariates);
-RcppExport SEXP _otm_compute_transition_probabilities(SEXP paramsSEXP, SEXP yprevSEXP, SEXP daySEXP, SEXP covariatesSEXP) {
+NumericVector compute_transition_probabilities(List params, int yprev, int day, int treatment);
+RcppExport SEXP _otm_compute_transition_probabilities(SEXP paramsSEXP, SEXP yprevSEXP, SEXP daySEXP, SEXP treatmentSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
     Rcpp::traits::input_parameter< int >::type yprev(yprevSEXP);
     Rcpp::traits::input_parameter< int >::type day(daySEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type covariates(covariatesSEXP);
-    rcpp_result_gen = Rcpp::wrap(compute_transition_probabilities(params, yprev, day, covariates));
+    Rcpp::traits::input_parameter< int >::type treatment(treatmentSEXP);
+    rcpp_result_gen = Rcpp::wrap(compute_transition_probabilities(params, yprev, day, treatment));
     return rcpp_result_gen;
 END_RCPP
 }
 // generate_dataset
-DataFrame generate_dataset(List params, NumericVector covariates, int baseline_y, IntegerVector times, bool absorb, int n_subjects);
-RcppExport SEXP _otm_generate_dataset(SEXP paramsSEXP, SEXP covariatesSEXP, SEXP baseline_ySEXP, SEXP timesSEXP, SEXP absorbSEXP, SEXP n_subjectsSEXP) {
+DataFrame generate_dataset(List params, int treatment, int baseline_y, IntegerVector times, bool absorb, int n_subjects);
+RcppExport SEXP _otm_generate_dataset(SEXP paramsSEXP, SEXP treatmentSEXP, SEXP baseline_ySEXP, SEXP timesSEXP, SEXP absorbSEXP, SEXP n_subjectsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< List >::type params(paramsSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type covariates(covariatesSEXP);
+    Rcpp::traits::input_parameter< int >::type treatment(treatmentSEXP);
     Rcpp::traits::input_parameter< int >::type baseline_y(baseline_ySEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type times(timesSEXP);
     Rcpp::traits::input_parameter< bool >::type absorb(absorbSEXP);
     Rcpp::traits::input_parameter< int >::type n_subjects(n_subjectsSEXP);
-    rcpp_result_gen = Rcpp::wrap(generate_dataset(params, covariates, baseline_y, times, absorb, n_subjects));
+    rcpp_result_gen = Rcpp::wrap(generate_dataset(params, treatment, baseline_y, times, absorb, n_subjects));
     return rcpp_result_gen;
 END_RCPP
 }

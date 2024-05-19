@@ -4,12 +4,12 @@
 \alias{compute_transition_probabilities}
 \title{Compute a vector of transition probability from an OTM}
 \usage{
-compute_transition_probabilities(params, yprev, day, covariates)
+compute_transition_probabilities(params, yprev, day, treatment)
 }
 \arguments{
 \item{params}{A named list containing the parameters of the OTM.
 Must include "beta_yprev": k-1 parameters for the k previous states,
-"beta_regression": parameters for each covariates,
+"beta_treatment": parameter for the treatment effect,
 "beta_time": a single slope for the time parameter, and
 "cutpoints": the cutpoint parameters.}
 
@@ -17,7 +17,7 @@ Must include "beta_yprev": k-1 parameters for the k previous states,
 
 \item{day}{The day to compute the transition probabilities for.}
 
-\item{covariates}{A vector of covariates}
+\item{treatment}{Treatment group? 0 or 1.}
 }
 \value{
 A vector of transition probabilities.

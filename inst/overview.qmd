@@ -1,36 +1,6 @@
 ---
 title: "Overview"
 author: "Max Rohde"
-date: today
-toc: true
-toc-depth: 4
-toc-location: left
-knitr:
-  opts_chunk: 
-    dev: "ragg_png"
-format:
-  html:
-    code-tools: true
-    code-fold: false
-    code-link: true
-    standalone: true
-    embed-resources: true
-    code-block-bg: "#f1f3f5"
-    code-block-border-left: "#31BAE9"
-    mainfont: Source Sans Pro
-    theme: cosmo
-    fontsize: 16px
-    fig-format: retina
-    fig-cap-location: margin
-    tbl-cap-location: top
-    reference-location: margin
-    citation-location: margin
-    fig-width: 8
-    fig-height: 6
-  
-execute:
-  warning: false
-  message: false
 ---
 
 ```{r}
@@ -63,36 +33,22 @@ params <-
       15.471452261
     ),
     beta_time = -0.013360423,
-    beta_regression = -0.094833284
+    beta_treatment = -0.094833284
   )
 ```
 
-Compute the SOPs by simulation.
+## Generate data
 
 ```{r}
 df <- generate_dataset(params,
-                       covariates = 1,
+                       treatment = 0,
                        baseline_y = 4,
                        absorb = TRUE,
                        times = 1:28,
-                       n_subjects = 1e5)
+                       n_subjects = 500)
 ```
 
-```{r}
-sim_sop <-
-  df |>
-    summarize(n = n(),
-              .by = c("day", "y")) |>
-    mutate(sop = n / sum(n),
-           .by = c("day")) |>
-    complete(day,
-             y,
-             fill = list(sop = 0)) |>
-    arrange(day, y) |>
-    pull(sop)
-```
-
-Compute the theoretical SOPs analytically (recursive matrix multiplication).
+## Compute SOPs analytically
 
 ```{r}
 theoretical_sop <-
@@ -104,12 +60,6 @@ compute_sop(params = params,
             output_type = "df") |>
   arrange(day, y) |>
   pull(sop)
-```
-
-Compare them -- should be all close to zero.
-
-```{r}
-(sim_sop - theoretical_sop) |> round(3)
 ```
 
 Demonstrate SOP plotting function:
