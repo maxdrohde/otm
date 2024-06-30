@@ -1,5 +1,5 @@
 # Declare variables for use in summarise
-utils::globalVariables(c("y", "day"))
+utils::globalVariables(c("y", "t"))
 
 # Get the index that corresponds to death
 # Return NA if not present
@@ -60,10 +60,10 @@ create_survival <- function(df,
   # death day, last day, and recovery day
   surv_df <-
     df |>
-    dplyr::summarise(death_day = day[death_index(y,
+    dplyr::summarise(death_day = t[death_index(y,
                                                  death_state = death_state)],
-                     last_day = max(day),
-                     recovery_day = day[recovery_index(y,
+                     last_day = max(t),
+                     recovery_day = t[recovery_index(y,
                                                        recovery_states = recovery_states)],
                      .by="id")
 
