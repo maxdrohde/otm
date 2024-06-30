@@ -105,7 +105,7 @@ generate_trajectory <- function(cutpoints,
       }
 
       # Set next day
-      day <- times[[i]]
+      t <- times[[i]]
       yprev <- y
     }
 

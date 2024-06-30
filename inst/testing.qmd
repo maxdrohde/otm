@@ -16,10 +16,11 @@ theme_set(cowplot::theme_cowplot(font_size=12,
 ```{r}
 cutpoints = c(2.704779695, 3.283274970, 3.759044255, 6.152768017, 9.928567811, 12.594702347, 19.080282386)
 beta_yprev = c(0.006164718, 3.668244235, 4.756980385, 7.696745715, 11.098149358, 15.471452261)
-beta_t = -0.1
-beta_tx = -0.1
+beta_t = -0.02
+beta_tx = -0.2
 beta_t_tx = 0
 ```
+
 
 ## Generate data
 
@@ -29,8 +30,8 @@ df <- generate_dataset(cutpoints = cutpoints,
                        beta_t = beta_t,
                        beta_tx = beta_tx,
                        beta_t_tx = beta_t_tx,
-                       tx_end = 7,
-                       baseline_y = 4,
+                       tx_end = 2,
+                       baseline_y = 5,
                        times = 1:28,
                        tx_type = "constant",
                        absorb = 8,
@@ -39,7 +40,6 @@ df <- generate_dataset(cutpoints = cutpoints,
 
 ```{r}
 df |>
-  mutate(tx = as.factor(tx)) |>
   mutate(y = as.factor(y)) |>
   group_by(t, y, tx) |>
   count() |>
@@ -52,7 +52,7 @@ df |>
   scale_x_continuous(breaks = unique(df$t)) +
   scale_color_brewer(palette = "Dark2") +
   scale_y_continuous(breaks = seq(0, 1, by=0.1)) +
-  coord_cartesian(ylim = c(0,0.7)) +
+  coord_cartesian(ylim = c(0,1)) +
   labs(x = "Study day",
        y = "Empirical State Occupancy Probability",
        color = "State",
