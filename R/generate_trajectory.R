@@ -1,44 +1,3 @@
-compute_transition_probabilities <- function(cutpoints,
-                                             beta_yprev,
-                                             beta_t,
-                                             beta_tx,
-                                             beta_t_tx,
-                                             tx_type,
-                                             tx_end,
-                                             yprev,
-                                             t,
-                                             tx){
-
-  # Use if treatment effect is constant over time
-  if (tx_type == "constant") {
-    stopifnot(beta_t_tx == 0)
-
-    # Compute linear predictor
-    eta <-
-      ifelse(yprev == 1, 0, beta_yprev[[yprev - 1]]) +
-      beta_tx * tx * ifelse(t <= tx_end, 1, 0) +
-      beta_t * t
-  }
-
-  # Use if treatment effect changes linearly over time
-  if (tx_type == "linear") {
-    stopifnot(beta_t_tx != 0)
-
-    # Compute linear predictor
-    eta <-
-      ifelse(yprev == 1, 0, beta_yprev[[yprev - 1]]) +
-      beta_tx * tx * ifelse(t <= tx_end, 1, 0) +
-      beta_t * t +
-      beta_t_tx * tx * ifelse(t > tx_end, tx_end + 1, t)
-  }
-
-  # Compute transition probabilities
-  probabilities <- stats::plogis(cutpoints - eta)
-  probabilities <- c(probabilities, 1) - c(0, probabilities)
-
-  return(probabilities)
-}
-
 generate_trajectory <- function(cutpoints,
                                 beta_yprev,
                                 beta_t,
@@ -52,13 +11,12 @@ generate_trajectory <- function(cutpoints,
                                 absorb,
                                 id){
 
-    # Define the numbers of y states and the number of yprev states
     n_y <- length(cutpoints) + 1
     n_yprev <- length(beta_yprev) + 1
-    y_levels <- 1:n_y
-    yprev_states <- y_levels[-absorb]
 
-    # Store the simulated y values
+    y_levels <- 1:n_y
+
+    # Create the vectors ahead of time before filling in the values
     t_max <- max(times)
     y_stored <- integer(t_max)
     yprev_stored <- integer(t_max)
@@ -66,99 +24,71 @@ generate_trajectory <- function(cutpoints,
     # Counter for the number of iterations
     i <- 1
 
-    # Set day to the first time
+    # Initialize time to the first time point
     t <- times[[i]]
-
-    # Baseline state
+    # Initialize previous state to the baseline state
     yprev <- baseline_y
 
     while (TRUE) {
 
-      # Calculate the transition probabilities from the fitted model
-      transition_probabilities <-
-        compute_transition_probabilities(cutpoints = cutpoints,
-                                         beta_yprev = beta_yprev,
-                                         beta_t = beta_t,
-                                         beta_tx = beta_tx,
-                                         beta_t_tx = beta_t_tx,
-                                         tx_end = tx_end,
-                                         yprev = yprev,
-                                         t = t,
-                                         tx = tx,
-                                         tx_type = tx_type)
+      # Calculate the linear predictor based on the
+      # previous state, current time, and model parameters
+      eta <-
+        otm:::compute_eta(
+          beta_yprev = beta_yprev,
+          beta_t = beta_t,
+          beta_tx = beta_tx,
+          beta_t_tx = beta_t_tx,
+          tx_end = tx_end,
+          yprev = yprev,
+          t = t,
+          tx = tx,
+          tx_type = tx_type)
+
+      # Calculate the probabilities for each ordinal state
+      trans_probs <-
+        otm:::compute_ord_prob(cutpoints = cutpoints,
+                               eta = eta)
 
       # Move to the next state according to the transition probabilities
       y <- sample(x = y_levels,
                   size = 1,
-                  prob = transition_probabilities)
+                  prob = trans_probs)
 
-      # Save the value of y
+      # Store the current state and previous state for this iteration
       y_stored[[i]] <- y
       yprev_stored[[i]] <- yprev
 
-      # Increment counter
+      # Increment loop counter
       i <- i + 1
 
-      # Break condition
+      # Break if the maximum time is reached
+      # or an absorbing state is reached
       if ((i > length(times)) || (y == absorb)) {
         break
       }
 
-      # Set next day
+      # Set time to the next time point
       t <- times[[i]]
+      # Set the current state to be the next previous state
       yprev <- y
     }
 
-    # Remove trailing zeros
+    # Remove trailing zeros (from initializing the vector with zeros)
     index <- match(0, y_stored) - 1
     if (!is.na(index)) {
       y_stored <- head(y_stored, index)
       yprev_stored <- head(yprev_stored, index)
     }
 
-    out <- data.frame(t = times[1:length(y_stored)],
-                      y = y_stored,
-                      yprev = yprev_stored,
-                      tx = tx,
-                      id = id)
+    num_obs <- length(y_stored)
 
-    return(out)
-}
+    trajectory <-
+      cbind(t = times[1:num_obs],
+            y = y_stored,
+            yprev = yprev_stored,
+            tx = tx,
+            id = id)
 
-#' TBD
-#' @export
-generate_dataset <-
-  function(cutpoints,
-           beta_yprev,
-           beta_t,
-           beta_tx,
-           beta_t_tx,
-           tx_end,
-           baseline_y,
-           times,
-           tx_type,
-           absorb,
-           n_subjects){
-
-    m <- purrr::map2(1:n_subjects,
-                     c(rep(1L,n_subjects / 2), rep(0L,n_subjects / 2)),
-                     ~generate_trajectory(cutpoints = cutpoints,
-                                          beta_yprev = beta_yprev,
-                                                   beta_t = beta_t,
-                                                   beta_tx = beta_tx,
-                                                   beta_t_tx = beta_t_tx,
-                                                   tx_end = tx_end,
-                                                   baseline_y = baseline_y,
-                                                   tx = .y,
-                                                   times = times,
-                                                   tx_type = tx_type,
-                                                   absorb = absorb,
-                                                   id = .x),
-                    .progress = FALSE)
-
-    m <- data.table::rbindlist(m)
-
-    m$yprev <- as.factor(m$yprev)
-    m$tx <- as.factor(m$tx)
-    return(m)
+    return(trajectory)
 }
