@@ -1,6 +1,0 @@
-model,power,prop_na,iterations,sample_size,baseline_y,beta_t,beta_tx,beta_t_tx,tx_end,tx_type
-otm_spline_3,0.8,0,100,300,7,-0.02,0,-0.02,14,linear
-otm_spline_6,0.72,0,100,300,7,-0.02,0,-0.02,14,linear
-cox_prop,0.78,0,100,300,7,-0.02,0,-0.02,14,linear
-cox_spline_3,0.55,0,100,300,7,-0.02,0,-0.02,14,linear
-cox_spline_4,0.54,0,100,300,7,-0.02,0,-0.02,14,linear

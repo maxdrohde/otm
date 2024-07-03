@@ -33,14 +33,14 @@ otm:::generate_one_subject(
 ```{r}
 df <-
 otm:::generate_ordinal_random_effects_data(
-  N = 5000,
-  cutpoints = c(-8.28, -7.89, -7.60, -5.95, -2.69, -0.58, 9.07),
-  beta_t = -0.4,
+  N = 300,
+  cutpoints = c(-3, -1, 0),
+  beta_t = -2 / 28,
   beta_tx = 0,
-  beta_t_tx = -0.1,
-  times = 1:28,
+  beta_t_tx = - 5 / 28,
+  times = 1:14,
   rand_intercept_sd = 4.51,
-  rand_slope_sd = 0.45,
+  rand_slope_sd = 0,
   rand_eff_corr = 0)
 ```
 
@@ -70,10 +70,17 @@ df |>
 ```
 
 ```{r}
-mod <- ordinal::clmm(formula = y ~ t + tx + tx:t + (1 + t|id), nAGQ = 5,
+mod_full <- ordinal::clmm(formula = y ~ t + tx + tx:t + (1|id),
                      link = "logit",
-                     control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
                      data = df)
+
+mod_reduced <- ordinal::clmm(formula = y ~ t + (1|id),
+                     link = "logit",
+                     data = df)
+
+anova(mod_full, mod_reduced)
+
+as.data.frame(anova(mod_full, mod_reduced))$`Pr(>Chisq)`[[2]]
 ```
 
 ```{r}
