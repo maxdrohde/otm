@@ -1,0 +1,99 @@
+---
+title: "Overview"
+author: "Max Rohde"
+---
+
+```{r}
+library(tidyverse)
+load_all()
+```
+
+```{r}
+cutpoints = c(2.704779695, 3.283274970, 3.759044255, 6.152768017, 9.928567811, 12.594702347, 19.080282386)
+beta_yprev = c(0.006164718, 3.668244235, 4.756980385, 7.696745715, 11.098149358, 15.471452261)
+beta_t = -0.02
+beta_tx = 0
+beta_t_tx = -0.02
+```
+
+```{r}
+otm:::generate_one_subject(
+  cutpoints = c(2.704779695, 3.283274970, 3.759044255, 6.152768017, 9.928567811, 12.594702347, 19.080282386),
+  beta_t = -0.02,
+  beta_tx = 0,
+  beta_t_tx = -0.01,
+  tx = 1L,
+  times = 1:28,
+  rand_intercept_sd = 1,
+  rand_slope_sd = 1,
+  rand_eff_corr = 0.2,
+  id = 1)
+```
+
+```{r}
+df <-
+otm:::generate_ordinal_random_effects_data(
+  N = 5000,
+  cutpoints = c(-8.28, -7.89, -7.60, -5.95, -2.69, -0.58, 9.07),
+  beta_t = -0.4,
+  beta_tx = 0,
+  beta_t_tx = -0.1,
+  times = 1:28,
+  rand_intercept_sd = 4.51,
+  rand_slope_sd = 0.45,
+  rand_eff_corr = 0)
+```
+
+```{r}
+fig <-
+df |>
+  mutate(tx = as.factor(tx)) |>
+  mutate(y = as.factor(y)) |>
+  group_by(t, y, tx) |>
+  count() |>
+  group_by(t, tx) |>
+  mutate(n = n / sum(n)) |>
+  ggplot() +
+  aes(x = t, y = n, color=y, linetype=tx) +
+  geom_line() +
+  geom_point(alpha=0.6, size=0.5) +
+  scale_x_continuous(breaks = unique(df$t)) +
+  scale_color_brewer(palette = "Dark2") +
+  scale_y_continuous(breaks = seq(0, 1, by=0.1)) +
+  coord_cartesian(ylim = c(0,1)) +
+  labs(x = "Study day",
+       y = "Empirical State Occupancy Probability",
+       color = "State",
+       linetype = "Treatment") +
+  cowplot::theme_minimal_hgrid(font_size = 12,
+                               font_family = "Source Sans Pro")
+```
+
+```{r}
+mod <- ordinal::clmm(formula = y ~ t + tx + tx:t + (1 + t|id), nAGQ = 5,
+                     link = "logit",
+                     control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
+                     data = df)
+```
+
+```{r}
+fit1 <- geepack::ordgee(formula = y ~ t + tx + tx:t,
+                id = df$id,
+                data = df,
+                mean.link = "logit")
+
+fit2 <- geepack::ordgee(formula = y ~ t,
+                id = df$id,
+                data = df,
+                mean.link = "logit")
+```
+
+
+```{r}
+repolr::repolr(y ~ t + tx + tx:t,
+               categories = 8,
+               subjects = "id",
+               times = 1:10,
+               data = df)
+```
+

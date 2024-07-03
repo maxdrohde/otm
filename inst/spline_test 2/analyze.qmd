@@ -1,0 +1,144 @@
+---
+title: "XXXXXXX"
+subtitle: "XXXXXXXX"
+author: "Max Rohde"
+date: today
+toc: true
+toc-depth: 4
+toc-location: left
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+format:
+  html:
+    code-tools: true
+    code-fold: false
+    code-link: true
+    standalone: true
+    embed-resources: true
+    code-block-bg: "#f1f3f5"
+    code-block-border-left: "#31BAE9"
+    mainfont: Source Sans Pro
+    theme: cosmo
+    fontsize: 16px
+    fig-format: retina
+    fig-cap-location: margin
+    tbl-cap-location: top
+    reference-location: margin
+    citation-location: margin
+    fig-width: 8
+    fig-height: 6
+  
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(tidyverse)
+
+# Set global ggplot theme
+theme_set(cowplot::theme_cowplot(font_size=12,
+                                 font_family = "Source Sans Pro"))
+```
+
+```{r}
+# Get paths of all the CSV files
+paths <- fs::dir_ls(path = "./results",
+                    glob = "*.csv")
+
+# Read in all CSV files
+# Attach a unique ID to each simulation setting
+# Pivot data longer
+df <-
+  map(paths,
+      ~read_csv(.x, show_col_types = FALSE),
+      .progress = TRUE) |>
+  list_rbind()
+```
+
+```{r}
+df$model <-
+  case_match(
+    df$model,
+    "otm_power" ~ "Ordinal Transition Model",
+    "cox_power" ~ "Cox Proportional Hazards Model"
+  )
+```
+
+```{r}
+fig1 <-
+  df |>
+  filter(beta_t == -0.02) |>
+  filter(beta_tx == 0) |>
+  #filter(beta_t_tx == -0.02) |>
+  filter(sample_size == 300) |>
+  ggplot() +
+  aes(x = tx_end,
+      y = power,
+      color = model) +
+  scale_x_continuous(breaks = c(2, 7, 14, 21, 28)) +
+  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1)) +
+  coord_cartesian(ylim = c(0,1)) +
+  scale_color_brewer(palette = "Dark2") +
+  #geom_point() +
+  #geom_line() +
+  geom_smooth(se = FALSE, linewidth = 0.5) +
+  facet_grid(baseline_y~beta_t_tx) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(title = "Linear Treatment by Time Interaction until day X",
+       subtitle = "Starting treatment effect = 0\nColumns: Number of Knots\nRows: Baseline State",
+       x = "Time to Maximum Treatment Effect",
+       y = "Power",
+       color = "")
+
+ggsave(
+  filename = "linear_tx_by_time1.png", 
+  plot = fig1,
+  bg = "white",
+  units="in",
+  height=9,
+  width=16,
+  dpi=500)
+```
+
+```{r}
+fig2 <-
+  df |>
+  filter(model != "diff_power") |>
+  filter(model != "ratio_power") |>
+  filter(beta_t == -0.02) |>
+  filter(beta_t_tx == -0.02) |>
+  filter(sample_size == 200) |>
+  filter(beta_tx == -0.2) |>
+  #filter(knots == 3) |>
+  ggplot() +
+  aes(x = tx_end,
+      y = power,
+      color = model) +
+  scale_x_continuous(breaks = c(2, 7, 14, 21, 28)) +
+  scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1)) +
+  coord_cartesian(ylim = c(0,1)) +
+  scale_color_brewer(palette = "Dark2") +
+  geom_point() +
+  geom_line() +
+  #geom_smooth(se = FALSE) +
+  facet_grid(baseline_y~knots) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(title = "Linear Treatment by Time Interaction until day X",
+       subtitle = "Starting treatment effect = -0.2\nColumns: Number of Knots\nRows: Baseline State",
+       x = "Time to Maximum Treatment Effect",
+       y = "Power",
+       color = "")
+
+ggsave(
+  filename = "linear_tx_by_time2.png", 
+  plot = fig2,
+  bg = "white",
+  units="in",
+  height=9,
+  width=16,
+  dpi=500)
+```

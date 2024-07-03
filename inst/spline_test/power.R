@@ -8,7 +8,7 @@ i <- as.integer(args[[1]])
 set.seed(i)
 
 # Number of iterations to compute power
-ITER <- 1000
+ITER <- 1
 
 # 324
 # PARAMETER SETTINGS FOR THE SIMULATION
