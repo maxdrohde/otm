@@ -88,7 +88,7 @@ m_list <-
 
   df$yprev <- dplyr::lag(df$y)
 
-  df <- filter(df, t !=0)
+  df <- dplyr::filter(df, t != 0)
 
   df$tx <- as.factor(df$tx)
   df$y <- as.ordered(df$y)
