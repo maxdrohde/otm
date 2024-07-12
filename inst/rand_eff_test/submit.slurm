@@ -9,14 +9,14 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1 
 #SBATCH --cpus-per-task=1
-#SBATCH --time=00:15:00
+#SBATCH --time=5:00:00
 #SBATCH --mem=2G
 
 # Name of output file
 #SBATCH --output=status_reports/out-%A-%a.out
 
 # Number of jobs in SLURM job array
-#SBATCH --array=1-324
+#SBATCH --array=1-124
 
 # Start time
 start=$(date +%s)

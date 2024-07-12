@@ -8,11 +8,11 @@ i <- as.integer(args[[1]])
 set.seed(i)
 
 # Number of iterations to compute power
-ITER <- 1000
+ITER <- 100
 
-# 108
+# 124
 # PARAMETER SETTINGS FOR THE SIMULATION
-GRID_sample_size <- c(200)
+GRID_sample_size <- seq(200, 500, 10)
 GRID_cutpoints <- list(c(-4, -2, -1))
 GRID_beta_t <- c(-0.1)
 GRID_beta_tx <- c(0)
@@ -39,10 +39,10 @@ beta_t_tx <- row$GRID_beta_t_tx[[1]]
 ################# Simulation code ##############################################
 run_sim <- function(){
 
-  times <- 1L:28L
+  times <- 1L:10L
   tmax <- max(times)
   death_state <- 8L
-  recovery_states <- c(1L, 2L, 3L)
+  recovery_states <- c(1L)
 
 
 df <-
@@ -52,7 +52,7 @@ otm:::generate_ordinal_random_effects_data(
   beta_t = beta_t,
   beta_tx = beta_tx,
   beta_t_tx = beta_t_tx,
-  times = 1:10,
+  times = times,
   rand_intercept_sd = 4.51,
   rand_slope_sd = 0.45,
   rand_eff_corr = 0)
@@ -74,10 +74,10 @@ otm:::generate_ordinal_random_effects_data(
   #### FIT MODELS ####
   res <-
     data.frame(
-      otm_spline_3 = otm:::fit_otm(df, knots = 3),
-      rand_eff_spline_3 = otm:::fit_rand_eff(df, knots = 3),
+      otm_spline_3 = otm:::fit_otm(df, knots = 2),
+      rand_eff_spline_3 = otm:::fit_rand_eff(df, knots = 2),
       cox_prop = otm:::fit_cox(surv_df, type = "prop_hazard", knots = "not applicable"),
-      cox_spline_3 = otm:::fit_cox(surv_df, type = "spline", knots = 3)
+      cox_spline_3 = otm:::fit_cox(surv_df, type = "spline", knots = 2)
     )
 
   return(res)
