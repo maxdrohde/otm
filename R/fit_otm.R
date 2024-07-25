@@ -4,11 +4,11 @@ fit_otm <- function(df,
                     knots){
 
   mod_full <- VGAM::vglm(formula = y ~ yprev + splines::ns(t, df = knots+ 1) * tx,
-                    family = VGAM::cumulative(parallel = TRUE),
+                    family = VGAM::propodds(),
                     data = df)
 
   mod_reduced <- VGAM::vglm(formula = y ~ yprev + splines::ns(t, df = knots+ 1),
-                            family = VGAM::cumulative(parallel = TRUE),
+                            family = VGAM::propodds(),
                             data = df)
 
   tx_p_value <- VGAM::lrtest(mod_full, mod_reduced)@Body[2,5]
@@ -16,3 +16,15 @@ fit_otm <- function(df,
   return(tx_p_value)
 }
 
+safe_fit_otm <- function(df,
+                         knots) {
+  tryCatch({
+    fit_otm(df,
+            knots)
+  },
+  error = function(e) {
+    print("There was an error in the OTM model")
+    print(e)
+    return(NA)
+  })
+}

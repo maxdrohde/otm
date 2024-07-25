@@ -1,15 +1,18 @@
-generate_trajectory <- function(cutpoints,
-                                beta_yprev,
-                                beta_t,
-                                beta_tx,
-                                beta_t_tx,
-                                tx_end,
-                                baseline_y,
-                                tx,
-                                times,
-                                tx_type,
-                                absorb,
-                                id){
+# Generate a single trajectory from a OTM model
+generate_otm_trajectory <-
+  function(
+    cutpoints,
+    beta_yprev,
+    beta_t,
+    beta_tx,
+    beta_t_tx,
+    tx_end,
+    baseline_y,
+    tx,
+    times,
+    tx_type,
+    absorb,
+    id) {
 
     n_y <- length(cutpoints) + 1
     n_yprev <- length(beta_yprev) + 1
@@ -91,4 +94,61 @@ generate_trajectory <- function(cutpoints,
             id = id)
 
     return(trajectory)
-}
+  }
+
+
+# Generate data from an OTM model structure
+generate_otm_data <-
+  function(
+      n_subjects,
+      cutpoints,
+      beta_yprev,
+      beta_t,
+      beta_tx,
+      beta_t_tx,
+      tx_end,
+      baseline_y,
+      times,
+      tx_type,
+      absorb) {
+
+    if (tx_type == "constant") stopifnot(beta_t_tx == 0)
+    if (tx_type == "linear") stopifnot(beta_tx == 0)
+    if (tx_type == "linear_to_zero") stopifnot(beta_tx == 0)
+
+    # Allocate half to treatment, half to placebo
+    treatment_indicators <-
+      c(rep(1L, n_subjects / 2),
+        rep(0L, n_subjects / 2))
+
+    # Generate n_subjects number of trajectories
+    # Each trajectory is a matrix
+    m_list <- purrr::map2(
+      1:n_subjects,
+      treatment_indicators,
+      ~ otm:::generate_otm_trajectory(
+        cutpoints = cutpoints,
+        beta_yprev = beta_yprev,
+        beta_t = beta_t,
+        beta_tx = beta_tx,
+        beta_t_tx = beta_t_tx,
+        tx_end = tx_end,
+        baseline_y = baseline_y,
+        tx = .y,
+        times = times,
+        tx_type = tx_type,
+        absorb = absorb,
+        id = .x
+      )
+    )
+
+    # Combine the matrices into a data frame
+    df <-
+      do.call("rbind", m_list) |>
+      as.data.frame()
+
+    df$yprev <- as.factor(df$yprev)
+    df$tx <- as.factor(df$tx)
+
+    return(df)
+  }

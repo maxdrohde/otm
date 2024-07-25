@@ -51,7 +51,7 @@ generate_one_subject <- function(
   return(trajectory)
 }
 
-generate_ordinal_random_effects_data <- function(N,
+generate_ordinal_random_effects_data <- function(n_subjects,
                                                  times,
                                                  cutpoints,
                                                  beta_tx,
@@ -62,25 +62,24 @@ generate_ordinal_random_effects_data <- function(N,
                                                  rand_eff_corr){
 
 
-# Assign equal numbers to treatment and control
-tx_vector <- c(rep(0, N/2), rep(1, N/2))
+  # Assign equal numbers to treatment and control
+  tx_vector <- c(rep(0, n_subjects/2), rep(1, n_subjects/2))
 
-l <- list(
-     id = 1:N,
-     tx = tx_vector)
+  l <- list(
+       id = 1:n_subjects,
+       tx = tx_vector)
 
-m_list <-
-  purrr::pmap(l, ~generate_one_subject(id = ..1,
-                                      tx = ..2,
-                                      cutpoints = cutpoints,
-                                      times = times,
-                                      beta_tx = beta_tx,
-                                      beta_t = beta_t,
-                                      beta_t_tx = beta_t_tx,
-                                      rand_intercept_sd = rand_intercept_sd,
-                                      rand_slope_sd = rand_slope_sd,
-                                      rand_eff_corr = rand_eff_corr),
-              .progress = TRUE)
+  m_list <-
+    purrr::pmap(l, ~generate_one_subject(id = ..1,
+                                        tx = ..2,
+                                        cutpoints = cutpoints,
+                                        times = times,
+                                        beta_tx = beta_tx,
+                                        beta_t = beta_t,
+                                        beta_t_tx = beta_t_tx,
+                                        rand_intercept_sd = rand_intercept_sd,
+                                        rand_slope_sd = rand_slope_sd,
+                                        rand_eff_corr = rand_eff_corr))
 
   df <-
     do.call("rbind", m_list) |>
@@ -95,36 +94,3 @@ m_list <-
 
   return(df)
 }
-
-# df <-
-#   generate_ordinal_random_effects_data(N = 30,
-#                                        M = c(20),
-#                                        cutpoints = c(-4, -3, -2, -1, 0, 2, 5),
-#                                        beta_tx = -1,
-#                                        beta_t = -0.3,
-#                                        beta_t_tx = 0,
-#                                        rand_intercept_sd = 1,
-#                                        rand_slope_sd = 0.05,
-#                                        rand_eff_corr = 0)
-
-# df |>
-#   ggplot() +
-#   aes(x = t, y = y, group = id) +
-#   geom_step() +
-#   facet_wrap(~id)
-
-# mod <- ordinal::clmm(formula = y ~ t + tx + (1 + t|id),
-#                      control = ordinal::clmm.control(maxIter = 5000,
-#                                                      maxLineIter = 200,
-#                                                      useMatrix = TRUE),
-#                      link = "logit",
-#                      data = df)
-#
-# mod <- brms::brm(formula = y ~ t + tx + (1 + t|id),
-#                  data = df,
-#                  cores = 8,
-#                  chains = 8,
-#                  refresh = 10,
-#                  family = brms::cumulative(),
-#                  algorithm = "sampling",
-#                  backend = "cmdstanr")

@@ -1,7 +1,19 @@
-# Fit Cox model and return the Wald p-value
-fit_cox <- function(surv_df,
+fit_cox <- function(df,
+                    recovery_states,
+                    death_state,
+                    tmax,
                     type,
                     knots) {
+
+  stopifnot(type %in% c("prop_hazard", "spline"))
+
+  surv_df <-
+  otm:::create_survival(df,
+                        tmax = tmax,
+                        death_state = death_state,
+                        recovery_states = recovery_states)
+
+
   if (type == "prop_hazard") {
     mod <-
       survival::coxph(survival::Surv(time, status) ~ tx,
@@ -22,4 +34,20 @@ fit_cox <- function(surv_df,
   }
 
   return(tx_p_value)
+}
+
+safe_fit_cox <- function(df,
+                         recovery_states,
+                         death_state,
+                         tmax,
+                         type,
+                         knots) {
+  tryCatch({
+    fit_cox(df, recovery_states, death_state, tmax, type, knots)
+  },
+  error = function(e) {
+    print("There was an error in the Cox model")
+    print(e)
+    return(NA)
+  })
 }

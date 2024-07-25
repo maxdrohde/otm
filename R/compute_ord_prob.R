@@ -2,6 +2,7 @@
 # given the cutpoints and the linear predictor
 compute_ord_prob <- function(cutpoints,
                              eta) {
+
   cum_prob <- stats::plogis(cutpoints - eta)
 
   # Take difference of adjacent cumulative probabilities

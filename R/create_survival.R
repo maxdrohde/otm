@@ -1,4 +1,3 @@
-# Declare variables for use in summarise
 utils::globalVariables(c("y", "t"))
 
 # Get the index that corresponds to death
@@ -8,7 +7,6 @@ death_index <- function(y, death_state){
   if (length(index) == 0L) return(NA_integer_)
   return(index)
 }
-
 
 # Get the first index that corresponds to recovery
 # Return NA if not present
@@ -77,6 +75,13 @@ create_survival <- function(df,
                        last_day = .x$last_day,
                        recovery_day = .x$recovery_day,
                        tmax = tmax))
+
+  id_df <-
+    df |>
+    dplyr::filter(t == 1) |>
+    dplyr::select(id, tx)
+
+  surv_df <- dplyr::inner_join(surv_df, id_df, by = "id")
 
   return(surv_df)
 }
