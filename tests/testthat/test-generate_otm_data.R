@@ -7,6 +7,10 @@ test_that("OTM data generation linear", {
   beta_tx <- 0
   beta_t_tx <- -0.02
 
+  baseline_y <-
+    list(states = c(3,4,5,6),
+         proportions = c(0.25, 0.25, 0.25, 0.25))
+
   # Generate OTM Data
   df <-
   otm:::generate_otm_data(
@@ -16,7 +20,7 @@ test_that("OTM data generation linear", {
     beta_tx = beta_tx,
     beta_t_tx = beta_t_tx,
     tx_end = 14,
-    baseline_y = 4,
+    baseline_y = baseline_y,
     times = 1:14,
     tx_type = "linear",
     absorb = 999L,
@@ -73,6 +77,10 @@ test_that("OTM data generation constant", {
   beta_tx <- -2
   beta_t_tx <- 0
 
+  baseline_y <-
+    list(states = c(3,4,5,6),
+         proportions = c(0.25, 0.25, 0.25, 0.25))
+
   # Generate OTM Data
   df <-
     otm:::generate_otm_data(
@@ -82,7 +90,7 @@ test_that("OTM data generation constant", {
       beta_tx = beta_tx,
       beta_t_tx = beta_t_tx,
       tx_end = 14,
-      baseline_y = 4,
+      baseline_y = baseline_y,
       times = 1:14,
       tx_type = "constant",
       absorb = 999L,

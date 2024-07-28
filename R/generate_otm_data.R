@@ -117,15 +117,38 @@ generate_otm_data <-
     if (tx_type == "linear_to_zero") stopifnot(beta_tx == 0)
 
     # Allocate half to treatment, half to placebo
+    # Then randomize the treatment
     treatment_indicators <-
       c(rep(1L, n_subjects / 2),
-        rep(0L, n_subjects / 2))
+        rep(0L, n_subjects / 2)) |>
+      sample()
+
+    if (is.list(baseline_y)) {
+
+      # Ensure the proportions add to 1
+      stopifnot(sum(baseline_y$proportions) == 1)
+
+      # Create the correct number of subjects for
+      # each baseline state
+      baseline_states <- integer(0L)
+      for (i in 1:length(baseline_y$states)) {
+        baseline_states <-
+          c(baseline_states, rep(baseline_y$states[[i]],
+                                 n_subjects * baseline_y$proportions[[i]]))
+      }
+    } else{
+      # If the user provides a single number, just use that
+      # baseline state
+      stopifnot("Baseline state must be numeric" = is.numeric(baseline_y))
+      stopifnot("Provide just a single baseline state or provide proportions" =
+                length(baseline_y) == 1)
+      baseline_states <- rep(baseline_y, n_subjects)
+    }
 
     # Generate n_subjects number of trajectories
     # Each trajectory is a matrix
-    m_list <- purrr::map2(
-      1:n_subjects,
-      treatment_indicators,
+    m_list <- purrr::pmap(
+      list(1:n_subjects, treatment_indicators, baseline_states),
       ~ otm:::generate_otm_trajectory(
         cutpoints = cutpoints,
         beta_yprev = beta_yprev,
@@ -133,12 +156,12 @@ generate_otm_data <-
         beta_tx = beta_tx,
         beta_t_tx = beta_t_tx,
         tx_end = tx_end,
-        baseline_y = baseline_y,
-        tx = .y,
+        baseline_y = ..3,
+        tx = ..2,
         times = times,
         tx_type = tx_type,
         absorb = absorb,
-        id = .x
+        id = ..1
       )
     )
 
