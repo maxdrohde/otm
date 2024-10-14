@@ -126,7 +126,7 @@ generate_otm_data <-
     if (is.list(baseline_y)) {
 
       # Ensure the proportions add to 1
-      stopifnot(sum(baseline_y$proportions) == 1)
+      stopifnot(all.equal(sum(baseline_y$proportions), 1))
 
       # Create the correct number of subjects for
       # each baseline state
