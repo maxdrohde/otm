@@ -26,7 +26,7 @@ fit_otm_rand_eff <- function(df, knots, rand_slope){
                     data = df)
   }
 
-  a <- anova(mod_full, mod_reduced) |> as.data.frame()
+  a <- ordinal:::anova.clm(mod_full, mod_reduced) |> as.data.frame()
 
   tx_p_value <- a$`Pr(>Chisq)`[[2]]
 
