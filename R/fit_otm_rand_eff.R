@@ -4,24 +4,28 @@ fit_otm_rand_eff <- function(df, knots, rand_slope){
     mod_full <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) * tx + (1 + t|id),
                     nAGQ=1,
+                    control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
                     link = "logit",
                     data = df)
 
     mod_reduced <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) + (1 + t|id),
                     nAGQ=1,
+                    control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
                     link = "logit",
                     data = df)
   } else{
     mod_full <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) * tx + (1|id),
                     nAGQ=10,
+                    control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
                     link = "logit",
                     data = df)
 
     mod_reduced <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) + (1|id),
                     nAGQ=10,
+                    control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
                     link = "logit",
                     data = df)
   }

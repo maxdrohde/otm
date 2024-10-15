@@ -4,11 +4,11 @@ fit_rand_eff <- function(df,
   df$y <- as.ordered(df$y)
 
   mod_full <- ordinal::clmm(formula = y ~ splines::ns(t, df = knots+ 1) * tx + (1|id),
-                            link = "logit", control = ordinal::clmm.control(maxIter = 5000),
+                            link = "logit", control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
                             data = df)
 
   mod_reduced <- ordinal::clmm(formula = y ~ splines::ns(t, df = knots+ 1) + (1|id),
-                               link = "logit", control = ordinal::clmm.control(maxIter = 5000),
+                               link = "logit", control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
                                data = df)
 
   res <- ordinal:::anova.clm(mod_full, mod_reduced)
