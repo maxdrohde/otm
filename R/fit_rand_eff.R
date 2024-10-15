@@ -7,6 +7,7 @@ fit_rand_eff <- function(df, knots, rand_slope){
       ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) * tx + (1 + t|id),
                     nAGQ=1,
                     control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    Hess = FALSE,
                     link = "logit",
                     data = df)
 
@@ -14,6 +15,7 @@ fit_rand_eff <- function(df, knots, rand_slope){
       ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) + (1 + t|id),
                     nAGQ=1,
                     control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    Hess = FALSE,
                     link = "logit",
                     data = df)
   } else{
@@ -21,6 +23,7 @@ fit_rand_eff <- function(df, knots, rand_slope){
       ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) * tx + (1|id),
                     nAGQ=10,
                     control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    Hess = FALSE,
                     link = "logit",
                     data = df)
 
@@ -28,6 +31,7 @@ fit_rand_eff <- function(df, knots, rand_slope){
       ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) + (1|id),
                     nAGQ=10,
                     control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    Hess = FALSE,
                     link = "logit",
                     data = df)
   }
