@@ -1,31 +1,33 @@
 fit_otm_rand_eff <- function(df, knots, rand_slope){
 
+  MAXITER <- 5000
+
   if (rand_slope) {
     mod_full <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) * tx + (1 + t|id),
                     nAGQ=1,
-                    control = ordinal::clmm.control(maxIter = 1000000, method = "nlminb"),
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
                     link = "logit",
                     data = df)
 
     mod_reduced <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) + (1 + t|id),
                     nAGQ=1,
-                    control = ordinal::clmm.control(maxIter = 1000000, method = "nlminb"),
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
                     link = "logit",
                     data = df)
   } else{
     mod_full <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) * tx + (1|id),
                     nAGQ=10,
-                    control = ordinal::clmm.control(maxIter = 1000000, method = "nlminb"),
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
                     link = "logit",
                     data = df)
 
     mod_reduced <-
       ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) + (1|id),
                     nAGQ=10,
-                    control = ordinal::clmm.control(maxIter = 1000000, method = "nlminb"),
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
                     link = "logit",
                     data = df)
   }

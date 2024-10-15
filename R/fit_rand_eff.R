@@ -1,20 +1,51 @@
-fit_rand_eff <- function(df,
-                    knots){
+fit_rand_eff <- function(df, knots, rand_slope){
 
-  df$y <- as.ordered(df$y)
+  MAXITER <- 5000
 
-  mod_full <- ordinal::clmm(formula = y ~ splines::ns(t, df = knots+ 1) * tx + (1|id),
-                            link = "logit", control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
-                            data = df)
+  if (rand_slope) {
+    mod_full <-
+      ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) * tx + (1 + t|id),
+                    nAGQ=1,
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    link = "logit",
+                    data = df)
 
-  mod_reduced <- ordinal::clmm(formula = y ~ splines::ns(t, df = knots+ 1) + (1|id),
-                               link = "logit", control = ordinal::clmm.control(maxIter = 5000, maxLineIter = 5000),
-                               data = df)
+    mod_reduced <-
+      ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) + (1 + t|id),
+                    nAGQ=1,
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    link = "logit",
+                    data = df)
+  } else{
+    mod_full <-
+      ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) * tx + (1|id),
+                    nAGQ=10,
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    link = "logit",
+                    data = df)
 
-  res <- ordinal:::anova.clm(mod_full, mod_reduced)
+    mod_reduced <-
+      ordinal::clmm(formula = as.ordered(y) ~ splines::ns(t, df = knots+ 1) + (1|id),
+                    nAGQ=10,
+                    control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                    link = "logit",
+                    data = df)
+  }
 
-  tx_p_value <- as.data.frame(res)$`Pr(>Chisq)`[[2]]
+  a <- ordinal:::anova.clm(mod_full, mod_reduced) |> as.data.frame()
+
+  tx_p_value <- a$`Pr(>Chisq)`[[2]]
 
   return(tx_p_value)
 }
 
+safe_fit_rand_eff <- function(df, knots, rand_slope) {
+  tryCatch({
+    fit_rand_eff(df, knots, rand_slope)
+  },
+  error = function(e) {
+    print("There was an error in the random effects model")
+    print(e)
+    return(NA)
+  })
+}
