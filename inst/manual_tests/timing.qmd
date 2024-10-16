@@ -1,0 +1,82 @@
+---
+title: "Timing"
+subtitle: "Paper 2"
+author: "Max Rohde"
+date: today
+toc: true
+toc-depth: 4
+toc-location: left
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+format:
+  html:
+    code-tools: true
+    code-fold: false
+    code-link: true
+    standalone: true
+    embed-resources: true
+    code-block-bg: "#f1f3f5"
+    code-block-border-left: "#31BAE9"
+    mainfont: Source Sans Pro
+    theme: cosmo
+    fontsize: 16px
+    fig-format: retina
+    fig-cap-location: margin
+    tbl-cap-location: top
+    reference-location: margin
+    citation-location: margin
+    fig-width: 8
+    fig-height: 6
+  
+execute:
+  warning: false
+  message: false
+---
+
+# Load packages
+
+```{r}
+library(tidyverse)
+library(patchwork)
+library(bench)
+
+# Set global ggplot theme
+theme_set(cowplot::theme_cowplot(font_size=12,
+                                 font_family = "Source Sans Pro"))
+```
+
+```{r}
+df <-
+    otm:::generate_ordinal_random_effects_data(n_subjects = 100,
+                                           times = 1:28,
+                                           cutpoints = c(-2, -1, 0, 1,2,3,4),
+                                           beta_tx = -1,
+                                           beta_t = -0.05,
+                                           beta_t_tx = -0.05,
+                                           rand_intercept_sd = 1,
+                                           rand_slope_sd = 0.1,
+                                           rand_eff_corr = 0.3)
+
+```
+
+```{r}
+MAXITER <- 5000
+knots <- 6
+
+m <-
+  bench::mark(
+  f1 = ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) * tx + (1 + t|id),
+                nAGQ=1,
+                control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                link = "logit",
+                data = df),
+  f2 = ordinal::clmm(formula = as.ordered(y) ~ yprev + splines::ns(t, df = knots+ 1) * tx + (1 + t|id),
+                  nAGQ=1,
+                  control = ordinal::clmm.control(maxIter = MAXITER, method = "nlminb"),
+                  link = "logit",
+                  Hess = FALSE,
+                  data = df), check = FALSE, iterations = 5,
+)
+```
+

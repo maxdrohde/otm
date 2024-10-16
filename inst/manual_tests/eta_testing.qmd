@@ -1,0 +1,114 @@
+---
+title: "Test `compute_eta`"
+---
+
+```{r}
+library(otm)
+library(tidyverse)
+```
+
+## Constant
+
+```{r}
+beta_yprev <- c(-1, 0, 1, 2)
+beta_t <- 0
+beta_tx <- -2
+beta_t_tx <- 0
+tx_type <- "constant"
+tx_end <- 10
+yprev <- 3
+tx <- 1
+
+times <- 1:28
+```
+
+```{r}
+eta <- map_dbl(times, 
+  ~otm:::compute_eta(
+                  t = .x,
+                  beta_yprev = beta_yprev,
+                  beta_t = beta_t,
+                  beta_tx = beta_tx,
+                  beta_t_tx = beta_t_tx,
+                  tx_type = tx_type,
+                  tx_end = tx_end,
+                  yprev = yprev,
+                  tx = tx))
+```
+
+```{r}
+plot(times, eta)
+```
+
+## Linear
+
+```{r}
+beta_yprev <- c(-1, 0, 1, 2)
+beta_t <- 0
+beta_tx <- 0
+beta_t_tx <- -0.02
+tx_type <- "linear"
+tx_end <- 10
+yprev <- 3
+tx <- 1
+
+times <- 1:28
+```
+
+```{r}
+eta <- map_dbl(times, 
+  ~otm:::compute_eta(
+                  t = .x,
+                  beta_yprev = beta_yprev,
+                  beta_t = beta_t,
+                  beta_tx = beta_tx,
+                  beta_t_tx = beta_t_tx,
+                  tx_type = tx_type,
+                  tx_end = tx_end,
+                  yprev = yprev,
+                  tx = tx))
+```
+
+```{r}
+plot(times, eta)
+```
+
+## Linear to zero
+
+```{r}
+beta_yprev <- c(-1, 0, 1, 2)
+beta_t <- 0
+beta_tx <- 0
+beta_t_tx <- -0.02
+tx_type <- "linear_to_zero"
+tx_end <- 10
+yprev <- 3
+tx <- 1
+
+times <- 1:28
+```
+
+```{r}
+eta <- map_dbl(times, 
+  ~otm:::compute_eta(
+                  t = .x,
+                  beta_yprev = beta_yprev,
+                  beta_t = beta_t,
+                  beta_tx = beta_tx,
+                  beta_t_tx = beta_t_tx,
+                  tx_type = tx_type,
+                  tx_end = tx_end,
+                  yprev = yprev,
+                  tx = tx))
+```
+
+```{r}
+plot(times, eta)
+```
+
+
+
+
+
+
+
