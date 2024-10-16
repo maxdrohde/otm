@@ -4,6 +4,9 @@ module load GCC/11.3.0 OpenMPI/4.1.4 R/4.2.1
 # Install OTM from GitHub (make sure latest version is pushed)
 devtools::install_github("maxdrohde/otm")
 
+# Clone the OTM repo from GitHub
+https://github.com/maxdrohde/otm.git
+
 # Run the simulation locally with GNU PARALLEL
 # Adjust cores and number of jobs as needed
 parallel -j11 Rscript sim.R {} '>' status_reports/output_{}.txt ::: {1..36}
