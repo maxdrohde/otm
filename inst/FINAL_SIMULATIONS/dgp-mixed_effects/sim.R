@@ -71,7 +71,7 @@ run_sim <- function() {
   # Progress bar
   pb <- progress_bar$new(
     format = ":what :current/:total (:percent) (Estimated time :eta)",
-    clear = FALSE, total = n_sim)
+    clear = FALSE, force = TRUE, total = n_sim)
 
   for (SIM in 1:n_sim) {
 
