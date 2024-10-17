@@ -1,3 +1,5 @@
+library(progress)
+
 #-------------------------------------------------------------------------------
 # Read in the arguments from the command line
 args <- commandArgs(trailingOnly=TRUE)
@@ -26,36 +28,39 @@ death_state <- 999L
 
 
 
-
 #-------------------------------------------------------------------------------
-# 36
+# 144
 # Define simulation settings
 sim_settings <-
   expand.grid(
     sample_size = c(100, 200, 300),
-    cutpoints = list(c(-6, -4, -2, 0, 1, 2, 3)),
-    beta_t = c(-0.2),
-    beta_tx = c(0, -0.5),
+    cutpoints = list(c(-5, -3, -2, 0, 1, 2, 4)),
+    beta_t = c(-0.1, -0.2),
+    beta_tx = c(0, -0.2),
     beta_t_tx = c(0, -0.01),
     rand_intercept_sd = c(0.00001, 1),
-    rand_slope_sd = c(0.00001, 0.01)
+    rand_slope_sd = c(0.00001, 0.01, 0.05)
   )
 
-print(glue::glue("--------{nrow(sim_settings)} simulation settings--------"))
+cat(glue::glue("--------{nrow(sim_settings)} simulation settings--------\n\n"))
 
 params <- sim_settings[i,]
 #-------------------------------------------------------------------------------
-
-
-
 
 #-------------------------------------------------------------------------------
 run_sim <- function() {
   # NOTE: The arguments of this function are set after the definition of the
   # function body
-  
-  print(glue::glue("Running simulation setting {i} with {n_sim} iterations"))
-  print(params)
+
+  # Print parameters of this simulation for monitoring
+  cat(glue::glue("Running simulation setting {i} with {n_sim} iterations"))
+  cat("\n------------------------------------------\n")
+  cat("SIMULATION PARAMETERS\n")
+  for (cn in names(params)) {
+    print(glue::glue("{cn}: {params[[cn]]}"))
+  }
+  cat("------------------------------------------\n")
+  cat("\n")
 
   # Save arguments to append as metadata
   arguments <- as.list(environment())
@@ -63,10 +68,16 @@ run_sim <- function() {
   # Storage for each data frame of results
   data_frames <- vector("list", length = n_sim)
 
+  # Progress bar
+  pb <- progress_bar$new(
+    format = ":what :current/:total (:percent) (Estimated time :eta)",
+    clear = FALSE, total = n_sim)
+
   for (SIM in 1:n_sim) {
 
-    print(glue::glue("Iteration: {SIM}"))
-    
+    #print(glue::glue("Iteration: {SIM}"))
+    pb$tick(tokens = list(what = "ITERATION"))
+
     # Generate dataset
     df <-
       otm:::generate_ordinal_random_effects_data(
@@ -80,7 +91,7 @@ run_sim <- function() {
         rand_eff_corr = 0,
         n_subjects = sample_size[[1]]
       )
-    
+
     # Fit models to the data and store p-values
     res <-
       data.frame(
@@ -109,7 +120,7 @@ run_sim <- function() {
 
         data_frames[SIM] <- list(res)
   }
-  
+
   # Merge all simulation data frames
   power <- purrr::list_rbind(data_frames)
 
@@ -133,7 +144,7 @@ run_sim <- function() {
   power <- data.table::data.table(power, data.table::as.data.table(arguments))
   power$datetime <- Sys.time()
   datetime <- as.integer(Sys.time())
-  
+
   # Write the results out to CSV
   filename <- glue::glue("{i}_{datetime}.csv")
   readr::write_csv(x = power, file = glue::glue("results/{filename}"))
