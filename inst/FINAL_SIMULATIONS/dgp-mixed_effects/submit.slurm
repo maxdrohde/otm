@@ -10,7 +10,7 @@
 #SBATCH --ntasks=1               
 #SBATCH --cpus-per-task=1        
 #SBATCH --time=336:00:00           
-#SBATCH --mem=2G
+#SBATCH --mem=10G
 #SBATCH --constraint=zen                
 
 # Name of output file
