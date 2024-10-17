@@ -9,4 +9,4 @@ git clone https://github.com/maxdrohde/otm.git
 
 # Run the simulation locally with GNU PARALLEL
 # Adjust cores and number of jobs as needed
-parallel -j11 Rscript sim.R {} '>' status_reports/output_{}.txt ::: {1..36}
+parallel -j11 Rscript sim.R {} '>' status_reports/output_{}.txt ::: {1..144}

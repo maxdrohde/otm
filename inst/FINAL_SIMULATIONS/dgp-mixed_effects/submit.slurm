@@ -9,14 +9,18 @@
 #SBATCH --nodes=1                
 #SBATCH --ntasks=1               
 #SBATCH --cpus-per-task=1        
-#SBATCH --time=96:00:00           
-#SBATCH --mem=2G                 
+#SBATCH --time=336:00:00           
+#SBATCH --mem=2G
+#SBATCH --constraint=zen                
 
 # Name of output file
 #SBATCH --output=status_reports/out-%A-%a.out   
 
 # Number of jobs in SLURM job array
-#SBATCH --array=1-144                      
+#SBATCH --array=1-144    
+
+# Print CPU information
+lscpu
 
 # Load R
 module load GCC/11.3.0 OpenMPI/4.1.4 R/4.2.1    
