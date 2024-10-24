@@ -1,5 +1,3 @@
-library(progress)
-
 #-------------------------------------------------------------------------------
 # Read in the arguments from the command line
 args <- commandArgs(trailingOnly=TRUE)
@@ -69,15 +67,9 @@ run_sim <- function() {
   # Storage for each data frame of results
   data_frames <- vector("list", length = n_sim)
 
-  # Progress bar
-  pb <- progress_bar$new(
-    format = ":what :current/:total (:percent) (Estimated time :eta)",
-    clear = FALSE, force = TRUE, total = n_sim)
-
+  iter_times <- rep(NA_real_, n_sim)
   for (SIM in 1:n_sim) {
-
-    #print(glue::glue("Iteration: {SIM}"))
-    pb$tick(tokens = list(what = "ITERATION"))
+    start <- bench::hires_time()
 
     baseline_y <-
       list(states = c(4,5,6,7),
@@ -126,6 +118,16 @@ run_sim <- function() {
         )
 
         data_frames[SIM] <- list(res)
+
+        end <-  bench::hires_time()
+        elapsed <- end - start
+        iter_times[[SIM]] <- elapsed
+        s <- summary(iter_times, na.rm = TRUE)
+        std <- sd(iter_times, na.rm = TRUE)
+        middle <- ((s[[4]]) *(n_sim - SIM)) |> bench::as_bench_time()
+        low <- ((s[[2]]) *(n_sim - SIM)) |> bench::as_bench_time()
+        high <- ((s[[5]]) *(n_sim - SIM)) |> bench::as_bench_time()
+        print(glue::glue("(Iteration: {SIM}) ({((SIM / n_sim) * 100) |> round(2)}%)    Estimated time left: {middle} [{low}, {high}]"))
   }
 
   # Merge all simulation data frames
