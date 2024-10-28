@@ -11,7 +11,7 @@ set.seed(i)
 
 
 #-------------------------------------------------------------------------------
-ITER <- 2000
+ITER <- 500
 #-------------------------------------------------------------------------------
 
 
@@ -27,17 +27,17 @@ death_state <- 999L
 
 
 #-------------------------------------------------------------------------------
-# 144
+# 80
 # Define simulation settings
 sim_settings <-
   expand.grid(
-    sample_size = c(100, 200, 300),
+    sample_size = c(100, 200, 300, 400, 500),
     cutpoints = list(c(-5, -3, -2, 0, 1, 2, 4)),
-    beta_t = c(-0.1, -0.2),
+    beta_t = c(-0.2),
     beta_tx = c(0, -0.2),
     beta_t_tx = c(0, -0.01),
     rand_intercept_sd = c(0.00001, 1),
-    rand_slope_sd = c(0.00001, 0.01, 0.05)
+    rand_slope_sd = c(0.00001, 0.05)
   )
 
 cat(glue::glue("--------{nrow(sim_settings)} simulation settings--------\n\n"))
