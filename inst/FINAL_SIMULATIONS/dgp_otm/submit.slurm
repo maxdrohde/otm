@@ -9,15 +9,15 @@
 #SBATCH --nodes=1                
 #SBATCH --ntasks=1               
 #SBATCH --cpus-per-task=1        
-#SBATCH --time=336:00:00           
-#SBATCH --mem=10G
-#SBATCH --constraint=zen                
+#SBATCH --time=72:00:00           
+#SBATCH --mem=20G
+#SBATCH --constraint=cascadelake               
 
 # Name of output file
 #SBATCH --output=status_reports/out-%A-%a.out   
 
 # Number of jobs in SLURM job array
-#SBATCH --array=1-120   
+#SBATCH --array=1-60
 
 # Print CPU information
 lscpu
