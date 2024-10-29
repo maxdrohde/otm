@@ -12,7 +12,7 @@ test_that("SYSTEM BUG?", {
                                                rand_slope_sd = 1e-05,
                                                rand_eff_corr = 0)
 
-  fit <- otm:::fit_rand_eff(df, 1, TRUE, TRUE)
+  fit <- otm:::fit_rand_eff(df, 1, FALSE, TRUE)
 
   print(fit$anova)
 
