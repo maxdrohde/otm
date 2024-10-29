@@ -1,0 +1,34 @@
+--------4 simulation settings--------
+Running simulation setting 2 with 20 iterations
+------------------------------------------
+SIMULATION PARAMETERS
+sample_size: 100
+cutpoints: c(-5, -3, -2, 0, 1, 2, 4)
+beta_t: -0.2
+beta_tx: 0
+beta_t_tx: 0
+rand_intercept_sd: 1
+rand_slope_sd: 1e-05
+------------------------------------------
+
+(Iteration: 1) (5%)    Estimated time left: 9.42m [9.42m, 9.42m]
+(Iteration: 2) (10%)    Estimated time left: 8.39m [8.13m, 8.66m]
+(Iteration: 3) (15%)    Estimated time left: 7.68m [7.3m, 7.92m]
+(Iteration: 4) (20%)    Estimated time left: 7.02m [6.67m, 7.22m]
+(Iteration: 5) (25%)    Estimated time left: 6.37m [6m, 6.55m]
+(Iteration: 6) (30%)    Estimated time left: 5.65m [5.26m, 6.06m]
+(Iteration: 7) (35%)    Estimated time left: 5.17m [4.74m, 5.58m]
+(Iteration: 8) (40%)    Estimated time left: 4.95m [4.39m, 5.42m]
+(Iteration: 9) (45%)    Estimated time left: 4.4m [3.97m, 4.8m]
+(Iteration: 10) (50%)    Estimated time left: 3.98m [3.63m, 4.33m]
+(Iteration: 11) (55%)    Estimated time left: 3.56m [3.28m, 3.87m]
+(Iteration: 12) (60%)    Estimated time left: 3.18m [2.93m, 3.41m]
+(Iteration: 13) (65%)    Estimated time left: 2.79m [2.58m, 2.96m]
+(Iteration: 14) (70%)    Estimated time left: 2.4m [2.21m, 2.54m]
+(Iteration: 15) (75%)    Estimated time left: 1.99m [1.84m, 2.12m]
+(Iteration: 16) (80%)    Estimated time left: 1.6m [1.47m, 1.71m]
+(Iteration: 17) (85%)    Estimated time left: 1.21m [1.1m, 1.27m]
+(Iteration: 18) (90%)    Estimated time left: 48.4s [44.3s, 51s]
+(Iteration: 19) (95%)    Estimated time left: 23.8s [22s, 25.5s]
+(Iteration: 20) (100%)    Estimated time left: 0 [0, 0]
+CSV file written for simulation 2

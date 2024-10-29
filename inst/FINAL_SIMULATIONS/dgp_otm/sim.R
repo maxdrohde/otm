@@ -51,6 +51,9 @@ run_sim <- function() {
   # NOTE: The arguments of this function are set after the definition of the
   # function body
 
+  # Save arguments to append as metadata
+  arguments <- as.list(environment())
+
   # Print parameters of this simulation for monitoring
   cat(glue::glue("Running simulation setting {i} with {n_sim} iterations"))
   cat("\n------------------------------------------\n")
@@ -60,9 +63,6 @@ run_sim <- function() {
   }
   cat("------------------------------------------\n")
   cat("\n")
-
-  # Save arguments to append as metadata
-  arguments <- as.list(environment())
 
   # Storage for each data frame of results
   data_frames <- vector("list", length = n_sim)
@@ -96,6 +96,7 @@ run_sim <- function() {
       data.frame(
         otm = otm:::safe_fit_otm(df, knots = 0),
         otm_rand_int_slope = otm:::safe_fit_otm_rand_eff(df, knots = 0, rand_slope = TRUE),
+        otm_rand_int = otm:::safe_fit_otm_rand_eff(df, knots = 0, rand_slope = FALSE),
         rand_int_slope = otm:::safe_fit_rand_eff(df, knots = 0, rand_slope = TRUE),
         free_days8 = otm:::safe_fit_free_days(df, bad_states = c(8L), death_state = death_state),
         free_days78 = otm:::safe_fit_free_days(df, bad_states = c(7L, 8L), death_state = death_state),

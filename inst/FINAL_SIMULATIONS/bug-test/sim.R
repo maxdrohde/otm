@@ -11,7 +11,7 @@ set.seed(i)
 
 
 #-------------------------------------------------------------------------------
-ITER <- 500
+ITER <- 20
 #-------------------------------------------------------------------------------
 
 
@@ -27,15 +27,15 @@ death_state <- 999L
 
 
 #-------------------------------------------------------------------------------
-# 80
+# 4
 # Define simulation settings
 sim_settings <-
   expand.grid(
-    sample_size = c(100, 200, 300, 400, 500),
+    sample_size = c(100),
     cutpoints = list(c(-5, -3, -2, 0, 1, 2, 4)),
     beta_t = c(-0.2),
-    beta_tx = c(0, -0.2),
-    beta_t_tx = c(0, -0.01),
+    beta_tx = c(0),
+    beta_t_tx = c(0),
     rand_intercept_sd = c(0.00001, 1),
     rand_slope_sd = c(0.00001, 0.05)
   )
@@ -87,9 +87,8 @@ run_sim <- function() {
     # Fit models to the data and store p-values
     res <-
       data.frame(
-        otm = otm:::safe_fit_otm(df, knots = 0),
-        otm_rand_int_slope = otm:::safe_fit_otm_rand_eff(df, knots = 0, rand_slope = TRUE),
-        otm_rand_int = otm:::safe_fit_otm_rand_eff(df, knots = 0, rand_slope = FALSE),
+        #otm = otm:::safe_fit_otm(df, knots = 0),
+        #otm_rand_int_slope = otm:::safe_fit_otm_rand_eff(df, knots = 0, rand_slope = TRUE),
         rand_int_slope = otm:::safe_fit_rand_eff(df, knots = 0, rand_slope = TRUE),
         free_days8 = otm:::safe_fit_free_days(df, bad_states = c(8L), death_state = death_state),
         free_days78 = otm:::safe_fit_free_days(df, bad_states = c(7L, 8L), death_state = death_state),
@@ -110,6 +109,8 @@ run_sim <- function() {
         cox_prop_state123 = otm:::safe_fit_cox(df, recovery_states = c(1L, 2L, 3L), death_state = death_state, tmax = tmax, type = "prop_hazard", knots = "not applicable"),
         cox_spline2_state123 = otm:::safe_fit_cox(df, recovery_states = c(1L, 2L, 3L), death_state = death_state, tmax = tmax, type = "spline", knots = 2L)
         )
+
+
 
         data_frames[SIM] <- list(res)
 
