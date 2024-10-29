@@ -1,4 +1,4 @@
-fit_rand_eff <- function(df, knots, rand_slope){
+fit_rand_eff <- function(df, knots, rand_slope, diagnostics = FALSE){
 
   MAXITER <- 5000
 
@@ -37,6 +37,16 @@ fit_rand_eff <- function(df, knots, rand_slope){
   }
 
   a <- ordinal:::anova.clm(mod_full, mod_reduced) |> as.data.frame()
+
+  if (diagnostics) {
+    return(
+      list(
+        "full" = mod_full,
+        "reduced" = mod_reduced,
+        "anova" = ordinal:::anova.clm(mod_full, mod_reduced)
+      )
+    )
+  }
 
   tx_p_value <- a$`Pr(>Chisq)`[[2]]
 
