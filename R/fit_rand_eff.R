@@ -1,4 +1,4 @@
-fit_rand_eff <- function(df, knots, rand_slope, diagnostics = FALSE){
+fit_rand_eff <- function(df, knots, rand_slope, diagnostics = FALSE, method = "nlminb"){
 
   MAXITER <- 5000
 
