@@ -1,29 +1,21 @@
 #-------------------------------------------------------------------------------
 # Read in the arguments from the command line
 args <- commandArgs(trailingOnly=TRUE)
-
-# First argument is the scenario
 i <- as.integer(args[[1]])
 
-# Second argument is the iteration
-j <- as.integer(args[[2]])
-
-# Create folder for the results
-folder <- glue::glue("results/{i}")
-if (!dir.exists(folder)) {
-  dir.create(folder)
-  print(paste("Folder created at:", folder))
-} else {
-  print("The folder already exists.")
-}
-
 # Set the seed based on the current job number
-set.seed(j)
+set.seed(i)
 #-------------------------------------------------------------------------------
 
+
+
+
 #-------------------------------------------------------------------------------
-ITER <- 20
+ITER <- 200
 #-------------------------------------------------------------------------------
+
+
+
 
 #-------------------------------------------------------------------------------
 # Global parameters
@@ -35,24 +27,24 @@ death_state <- 8L
 
 
 #-------------------------------------------------------------------------------
-# 25
+# 15
 # Define simulation settings
 sim_settings <-
   expand.grid(
-    sample_size = c(100, 200, 300, 400, 500),
+    sample_size = c(100, 200, 300),
     cutpoints = list(c(2.7, 3.3, 3.8, 6.2, 9.9, 12.6, 19.1)),
     beta_yprev = list(c(0, 3.7, 4.8, 7.7, 11.1, 15.5)),
     beta_t = c(-0.02),
-    beta_tx = c(0, -0.1),
-    beta_t_tx = c(0),
+    beta_tx = c(0),
+    beta_t_tx = c(0, -0.02),
     tx_end = c(3, 7, 14, 28),
-    tx_type = "constant"
+    tx_type = "linear"
   )
 
 # Remove redundant settings
 sim_settings <-
   sim_settings |>
-  dplyr::filter(!((beta_tx == 0) & (tx_end != 28)))
+  dplyr::filter(!((beta_t_tx == 0) & (tx_end != 28)))
 
 cat(glue::glue("--------{nrow(sim_settings)} simulation settings--------\n\n"))
 
@@ -122,12 +114,6 @@ run_sim <- function() {
         ppo_14 = otm:::safe_fit_single_day_ppo(df, 14, absorb = death_state, tmax = tmax),
         ppo_21 = otm:::safe_fit_single_day_ppo(df, 21, absorb = death_state, tmax = tmax),
         ppo_28 = otm:::safe_fit_single_day_ppo(df, 28, absorb = death_state, tmax = tmax),
-        cox_prop_state1_imp = otm:::safe_fit_cox_improvement(df, threshold = 1L, death_state = death_state, tmax = tmax, type = "prop_hazard", knots = "not applicable"),
-        cox_spline2_state1_imp = otm:::safe_fit_cox_improvement(df, threshold = 1L, death_state = death_state, tmax = tmax, type = "spline", knots = 2L),
-        cox_prop_state2_imp = otm:::safe_fit_cox_improvement(df, threshold = 2L, death_state = death_state, tmax = tmax, type = "prop_hazard", knots = "not applicable"),
-        cox_spline2_state2_imp = otm:::safe_fit_cox_improvement(df, threshold = 2L, death_state = death_state, tmax = tmax, type = "spline", knots = 2L),
-        cox_prop_state3_imp = otm:::safe_fit_cox_improvement(df, threshold = 3L, death_state = death_state, tmax = tmax, type = "prop_hazard", knots = "not applicable"),
-        cox_spline2_state3_imp = otm:::safe_fit_cox_improvement(df, threshold = 3L, death_state = death_state, tmax = tmax, type = "spline", knots = 2L),
         cox_prop_state1 = otm:::safe_fit_cox(df, recovery_states = c(1L), death_state = death_state, tmax = tmax, type = "prop_hazard", knots = "not applicable"),
         cox_spline2_state1 = otm:::safe_fit_cox(df, recovery_states = c(1L), death_state = death_state, tmax = tmax, type = "spline", knots = 2L),
         cox_prop_state12 = otm:::safe_fit_cox(df, recovery_states = c(1L, 2L), death_state = death_state, tmax = tmax, type = "prop_hazard", knots = "not applicable"),
@@ -152,21 +138,31 @@ run_sim <- function() {
   # Merge all simulation data frames
   power <- purrr::list_rbind(data_frames)
 
+  # Pivot from wide to long
+  power <-
+    power |>
+    tidyr::pivot_longer(everything(),
+                        names_to = "model",
+                        values_to = "p_value")
+
+  # Compute power based on p < 0.05
+  # and compute the proportion of failed simulations
+  power <-
+    power |>
+    dplyr::summarise(power = mean(p_value < 0.05,
+                                  na.rm = TRUE),
+                     prop_na = mean(is.na(p_value)),
+                     .by = "model")
+
   # Append the simulation parameters and the datetime
   power <- data.table::data.table(power, data.table::as.data.table(arguments))
   power$datetime <- Sys.time()
   datetime <- as.integer(Sys.time())
 
-  power$setting <- i
-  power$iteration <- j
-
   # Write the results out to CSV
-  filename <- glue::glue("{i}_{j}_{datetime}.csv")
-  readr::write_csv(x = power, file = glue::glue("results/{i}/{filename}"))
-
-  print(glue::glue("CSV file: {filename}"))
-  print(glue::glue("CSV file written for simulation {i} iteration {j} with a chunk size of {ITER}"))
-  print("-----------------------------------------------------------------------------------")
+  filename <- glue::glue("{i}_{datetime}.csv")
+  readr::write_csv(x = power, file = glue::glue("results/{filename}"))
+  print(glue::glue("CSV file written for simulation {i}"))
 }
 
 # Set the arguments of run_sim() based on the

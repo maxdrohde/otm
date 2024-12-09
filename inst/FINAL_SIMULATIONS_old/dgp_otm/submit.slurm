@@ -9,14 +9,15 @@
 #SBATCH --nodes=1                
 #SBATCH --ntasks=1               
 #SBATCH --cpus-per-task=1        
-#SBATCH --time=12:00:00           
-#SBATCH --mem=2G          
+#SBATCH --time=72:00:00           
+#SBATCH --mem=20G
+#SBATCH --constraint=cascadelake               
 
 # Name of output file
 #SBATCH --output=status_reports/out-%A-%a.out   
 
 # Number of jobs in SLURM job array
-#SBATCH --array=1-100
+#SBATCH --array=1-60
 
 # Print CPU information
 lscpu
@@ -25,4 +26,4 @@ lscpu
 module load GCC/11.3.0 OpenMPI/4.1.4 R/4.2.1    
 
 # Run R script
-Rscript --no-save sim.R $SETTING $SLURM_ARRAY_TASK_ID    
+Rscript --no-save sim.R $SLURM_ARRAY_TASK_ID    

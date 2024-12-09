@@ -1,0 +1,183 @@
+---
+title: "Simulation Analysis"
+subtitle: "Paper 2"
+author: "Max Rohde"
+date: today
+toc: true
+toc-depth: 4
+toc-location: left
+knitr:
+  opts_chunk: 
+    dev: "ragg_png"
+format:
+  html:
+    code-tools: true
+    code-fold: false
+    code-link: true
+    standalone: true
+    embed-resources: true
+    code-block-bg: "#f1f3f5"
+    code-block-border-left: "#31BAE9"
+    mainfont: Source Sans Pro
+    theme: cosmo
+    fontsize: 16px
+    fig-format: retina
+    fig-cap-location: margin
+    tbl-cap-location: top
+    reference-location: margin
+    citation-location: margin
+    fig-width: 8
+    fig-height: 6
+  
+execute:
+  warning: false
+  message: false
+---
+
+# Load packages
+
+```{r}
+library(tidyverse)
+library(patchwork)
+
+# Set global ggplot theme
+theme_set(cowplot::theme_cowplot(font_size=12,
+                                 font_family = "Source Sans Pro"))
+```
+
+# Read data
+
+```{r}
+df <-
+  read_csv("simulation_results.csv")
+
+df_wide <-
+  df |>
+  select(-prop_na) |>
+  pivot_wider(names_from = model,
+              values_from = power)
+```
+
+# Clean data
+
+```{r}
+df$type <-
+case_when(
+  grepl("otm_rand_int_slope", df$model, fixed = TRUE) ~ "OTM-IS",
+  grepl("otm_rand_int", df$model, fixed = TRUE) ~ "OTM-I",
+  grepl("rand_int_slope", df$model, fixed = TRUE) ~ "RIS",
+  grepl("rand_int", df$model, fixed = TRUE) ~ "RI",
+  grepl("otm", df$model, fixed = TRUE) ~ "OTM",
+  grepl("cox", df$model, fixed = TRUE) ~ "COX",
+  grepl("ppo", df$model, fixed = TRUE) ~ "PO",
+  grepl("free", df$model, fixed = TRUE) ~ "FR_DAY"
+)
+
+df$type <- factor(df$type, levels = unique(df$type))
+df$model <- factor(df$model, levels = unique(df$model))
+```
+
+```{r}
+# model_names <-
+#   c("OTM",
+#     "OTM (Spline 2)",
+#     "OTM (Spline 4)",
+#     "OTM (Spline 6)",
+#     "Free Days (5 to 8)", 
+#     "Free Days (4 to 8)",
+#     "Free Days (3 to 8)",
+#     "PPO Day 3",
+#     "PPO Day 7",
+#     "PPO Day 14",
+#     "PPO Day 21",
+#     "PPO Day 28",
+#     "Cox State 1",
+#     "Cox State 1 (Spline)", 
+#     "Cox States 1-3",
+#     "Cox States 1-3 (Spline)")
+# 
+# levels(df$model) <- model_names
+```
+
+# Plots
+
+```{r}
+  scale_color_manual(name = "Model",
+                     labels = unique(df$model),
+                     values=c(rep("black",4),
+                              rep("#AF47D2",3),
+                              rep( "#399918", 5),
+                              rep( "#E4003A", 4)),) +
+  scale_shape_manual(name = "Model",
+                     labels = unique(df$model),
+                     values=c(1:4, 1:3, 1:5, 1:4)) +
+```
+
+
+```{r}
+df |>
+  filter(beta_tx == -0.5, beta_t_tx == 0) |>
+  filter(rand_intercept_sd != 2) |>
+  ggplot() +
+  aes(x = type,
+      y = power) +
+  geom_point() +
+  geom_hline(yintercept = 0.05, linetype = 2) +
+  facet_grid(rand_intercept_sd ~ rand_slope_sd) +
+  #scale_y_continuous(breaks = c(0, 0.2, 0.4, 0.6, 0.8, 1)) +
+  #coord_cartesian(ylim = c(0,1)) +
+  labs(x = "", y = "Power",
+       subtitle = "Treatment Effect: Linear increase to day X",
+       caption = "") +
+  theme(axis.line.x = element_blank(),
+        axis.line.y = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text.y = element_text(angle = 0))+
+  cowplot::panel_border(size = 0.5) +
+  cowplot::background_grid(size.major = 0.1,
+                           size.minor = 0.1)
+```
+
+```{r}
+fig <-
+plot_fig(df, -0.02)
+
+ggsave(
+  filename = "otm_sim_linear.png", 
+  plot = fig,
+  bg = "white",
+  device = ragg::agg_png,
+  units="cm",
+  height=30,
+  width=46,
+  dpi=600,
+  scale = 0.5)
+
+fig <-
+plot_fig(df, 0)
+
+ggsave(
+  filename = "otm_sim_linear_type1error.png", 
+  plot = fig,
+  bg = "white",
+  device = ragg::agg_png,
+  units="cm",
+  height=60,
+  width=46,
+  dpi=600,
+  scale = 0.8)
+```
+
+```{r}
+# Example: Suppose you have 50 successes out of 100 trials
+successes <- 40
+n <- 500
+
+# 95% Confidence Interval for a Proportion
+result <- prop.test(successes, n, correct=FALSE)
+
+# View the result
+result
+
+```
+
