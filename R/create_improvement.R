@@ -62,7 +62,7 @@ create_improvement <- function(df,
   # death day, last day, and recovery day
   surv_df <-
     df |>
-    dplyr::mutate(y0 = yprev[[1]], .by = "id") |>
+    dplyr::mutate(y0 = as.integer(yprev)[[1]], .by = "id") |>
     dplyr::summarise(death_day = t[death_index(y,death_state = death_state)],
                      last_day = max(t),
                      recovery_day = t[improvement_index(y=y, y0=y0[[1]], threshold = threshold)],
