@@ -10,13 +10,13 @@ otm_verify(df)
 \item{df}{data.frame to check}
 }
 \value{
-Original data frame or error message
+Modified data frame
 }
 \description{
-This function does three things:
+This function:
 \itemize{
-\item Check that \code{id}, \code{t}, \code{yprev}, \code{t}, and \code{tx} columns are in the dataset
-\item Standardize the data types for the columns
-\item Sort the data by id and t
+\item Checks that \code{id}, \code{y}, \code{yprev}, \code{t}, and \code{tx} columns are in the dataset
+\item Standardizes the data types for the columns
+\item Sorts the data by \code{id} and \code{t}
 }
 }

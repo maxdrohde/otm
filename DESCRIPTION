@@ -27,3 +27,4 @@ Imports:
 LinkingTo: 
     Rcpp
 URL: https://maxdrohde.github.io/otm/
+Config/Needs/website: rmarkdown

@@ -1,0 +1,23 @@
+---
+title: "Getting started with the `otm` package"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(otm)
+```
+
+```{r}
+1+1
+```
+
+```{r}
+plot(mtcars)
+```
+

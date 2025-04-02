@@ -8,6 +8,13 @@
 \description{
 TBD.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://maxdrohde.github.io/otm/}
+}
+
+}
 \author{
 \strong{Maintainer}: Maximilian Rohde \email{maxdrohde@gmail.com} (\href{https://orcid.org/0000-0002-3731-3372}{ORCID})
 
