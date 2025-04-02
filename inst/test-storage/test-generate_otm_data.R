@@ -19,12 +19,12 @@ test_that("OTM data generation linear", {
     beta_t = beta_t,
     beta_tx = beta_tx,
     beta_t_tx = beta_t_tx,
-    tx_end = 14,
+    tx_end = 28,
     baseline_y = baseline_y,
-    times = 1:14,
+    times = 1:28,
     tx_type = "linear",
-    absorb = 999L,
-    n_subjects = 5000)
+    absorb = 6L,
+    n_subjects = 1000)
 
   mod_full <- VGAM::vglm(formula = y ~ yprev + t * tx,
                          family = VGAM::cumulative(parallel = TRUE),

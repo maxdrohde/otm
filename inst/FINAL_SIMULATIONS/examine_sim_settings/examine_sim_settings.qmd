@@ -80,7 +80,7 @@ df <-
         beta_t_tx = -0.1,
         times = 1:28,
         rand_intercept_sd = 1,
-        rand_slope_sd = 0.0001,
+        rand_slope_sd = 0.08,
         rand_eff_corr = 0,
         n_subjects = samp_size
       )
@@ -121,7 +121,7 @@ ggsave(
 ```{r}
 randeff_corr <-
   otm:::plot_spearman_corr(df, absorb = 999L, tmax = 28) +
-  labs(title = "Random intercept model") +
+  labs(title = "Random intercept and slope model") +
   coord_equal()
 ```
 

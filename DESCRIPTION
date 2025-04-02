@@ -26,3 +26,4 @@ Imports:
     waldo
 LinkingTo: 
     Rcpp
+URL: https://maxdrohde.github.io/otm/

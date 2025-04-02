@@ -1,35 +1,46 @@
+#' Carry absorbing state forward for ordinal longitudinal data
+#'
+#' @param df Input data frame
+#' @param absorb Which state is absorbing? Integer.
+#' @param tmax What is the last day of the trial? Integer.
+#' @return Data frame with absorbing state carried forward
+#' @export
+#'
 carry_absorbing_forward <- function(df, absorb, tmax){
 
+  df <- otm_verify(df)
+
+  # If the absorbing state is not present in the data,
+  # return the original data frame
   if (!(absorb %in% df$y)) {
       return(df)
   }
 
-  df <- data.table::as.data.table(df)
+  # Get ids for participants with an absorbing state
+  ids_absorb <-
+    df |>
+    dplyr::filter(y == absorb) |>
+    dplyr::pull(id) |>
+    unique()
 
-  df[, ddeath := if(any(y == absorb)) min(t[y == absorb]) else NA_integer_, by=id]
-
+  # For each participant with an absorbing state,
+  # carry their absorbing state forward
   df_absorb <-
     df |>
-    dplyr::mutate(y = as.integer(y),
-           yprev = as.integer(yprev)) |>
-    dplyr::filter(y == absorb) |>
+    dplyr::filter(id %in% ids_absorb) |>
     dplyr::group_by(id) |>
-    tidyr::complete(t = ddeath:tmax, fill=list(y=absorb, yprev=absorb, gap=1)) |>
-    dplyr::arrange(id, t) |>
-    tidyr::fill(everything())
+    tidyr::complete(t = 1:tmax) |>
+    tidyr::replace_na(list(y = absorb, yprev = absorb)) |>
+    tidyr::fill(everything(), .direction = "down") |>
+    dplyr::ungroup()
 
-  df_other_states <-
-    df |>
-    dplyr::filter(y != absorb) |>
-    dplyr::mutate(y = as.integer(y),
-                  yprev = as.integer(yprev)) |>
-    dplyr::arrange(id, t)
+  # Merge with the rest of the subjects
+  # and verify / sort the data
+  df <-
+    dplyr::bind_rows(df_absorb,
+                     dplyr::filter(df, !(id %in% ids_absorb))) |>
+    otm_verify()
 
-  df_forward <-
-    dplyr::bind_rows(df_other_states, df_absorb) |>
-    dplyr::mutate(y = as.integer(y),
-           yprev = as.factor(yprev)) |>
-    dplyr::arrange(id, t)
-
-  return(df_forward)
+  return(df)
 }
+
